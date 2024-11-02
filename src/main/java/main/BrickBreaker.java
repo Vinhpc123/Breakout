@@ -1,6 +1,6 @@
-import javax.swing.*;
 import java.awt.EventQueue;
 import java.io.IOException;
+import javax.swing.*;
 
 public class BrickBreaker extends JFrame {
 

@@ -1,7 +1,7 @@
 public interface Configurations
 {
-    int WIDTH = 500;
-    int HEIGHT = 500;
+    int WIDTH = 300;
+    int HEIGHT = 400;
     int TOP_EDGE = 10;
     int BOTTOM_EDGE = 390;
     int N_OF_BRICKS = 30;
