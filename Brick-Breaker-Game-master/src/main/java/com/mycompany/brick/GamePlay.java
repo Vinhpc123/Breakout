@@ -5,17 +5,18 @@
  */
 package com.mycompany.brick;
 
-import javax.swing.JPanel;
-import javax.swing.Timer;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 /**
  *
@@ -42,6 +43,9 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         setFocusTraversalKeysEnabled(false);
         Timer = new Timer(delay, this);
         Timer.start();
+
+        // Ensure the panel gets focus to handle key events
+        requestFocusInWindow();
     }
     
      public void paint(Graphics g) {
@@ -76,6 +80,8 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
             g.setFont(new Font("serif", Font.BOLD, 30));
             g.drawString("   Press Enter to Restart", 190, 340);
+
+            
         }
         if(totalbricks == 0){
             play = false;
@@ -101,6 +107,9 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         Timer.start();
 
         if (play) {
+
+            
+
             if (new Rectangle(ballposX, ballposY, 20, 20).intersects(new Rectangle(playerX, 550, 100, 8))) {
                 ballYdir = -ballYdir;
             }
