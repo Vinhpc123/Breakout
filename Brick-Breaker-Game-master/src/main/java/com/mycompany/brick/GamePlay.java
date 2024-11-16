@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -17,19 +18,21 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
     private boolean play = false;
     private int score = 0;
-    private int totalbricks = 21;
+    private int totalBricks = 21;
     private Timer timer;
     private int delay = 8;
+    private JFrame frame; // Reference to the JFrame
 
     private int playerX = 310; // Starting position of paddle
-    private int ballposX = 120; // Ball X position
-    private int ballposY = 350; // Ball Y position
-    private int ballXdir = -1; // Ball X direction
-    private int ballYdir = -2; // Ball Y direction
+    private int ballPosX = 120; // Ball X position
+    private int ballPosY = 350; // Ball Y position
+    private int ballXDir = -1; // Ball X direction
+    private int ballYDir = -2; // Ball Y direction
 
     private MapGenerator map;
 
-    public GamePlay() {
+    public GamePlay(JFrame frame) {
+        this.frame = frame;
         map = new MapGenerator(3, 7);
         addKeyListener(this);
         setFocusable(true);
@@ -64,17 +67,17 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
         // Ball
         g.setColor(new Color(255, 69, 0)); // Red-orange ball
-        g.fillOval(ballposX, ballposY, 20, 20);
+        g.fillOval(ballPosX, ballPosY, 20, 20);
 
         // Game over screen
-        if (ballposY > 570 || totalbricks == 0) {
+        if (ballPosY > 570 || totalBricks == 0) {
             play = false;
-            ballXdir = 0;
-            ballYdir = 0;
+            ballXDir = 0;
+            ballYDir = 0;
 
             g.setColor(new Color(255, 69, 0));
             g.setFont(new Font("Serif", Font.BOLD, 40));
-            g.drawString(totalbricks == 0 ? "You Win!" : "Game Over", 200, 300);
+            g.drawString(totalBricks == 0 ? "You Win!" : "Game Over", 200, 300);
 
             g.setFont(new Font("Arial", Font.BOLD, 20));
             g.drawString("Press Enter to Restart", 230, 350);
@@ -89,8 +92,8 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
         if (play) {
             // Ball and paddle collision
-            if (new Rectangle(ballposX, ballposY, 20, 20).intersects(new Rectangle(playerX, 550, 100, 8))) {
-                ballYdir = -ballYdir;
+            if (new Rectangle(ballPosX, ballPosY, 20, 20).intersects(new Rectangle(playerX, 550, 100, 8))) {
+                ballYDir = -ballYDir;
             }
 
             // Ball and bricks collision
@@ -104,17 +107,17 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
                         int bricksHeight = map.bricksHeight;
 
                         Rectangle rect = new Rectangle(brickX, brickY, bricksWidth, bricksHeight);
-                        Rectangle ballrect = new Rectangle(ballposX, ballposY, 20, 20);
+                        Rectangle ballRect = new Rectangle(ballPosX, ballPosY, 20, 20);
 
-                        if (ballrect.intersects(rect)) {
+                        if (ballRect.intersects(rect)) {
                             map.setBricksValue(0, i, j);
-                            totalbricks--;
+                            totalBricks--;
                             score += 5;
 
-                            if (ballposX + 19 <= rect.x || ballposX + 1 >= rect.x + bricksWidth) {
-                                ballXdir = -ballXdir;
+                            if (ballPosX + 19 <= rect.x || ballPosX + 1 >= rect.x + bricksWidth) {
+                                ballXDir = -ballXDir;
                             } else {
-                                ballYdir = -ballYdir;
+                                ballYDir = -ballYDir;
                             }
                             break A;
                         }
@@ -122,11 +125,11 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
                 }
             }
 
-            ballposX += ballXdir;
-            ballposY += ballYdir;
+            ballPosX += ballXDir;
+            ballPosY += ballYDir;
 
-            if (ballposX < 0 || ballposX > 670) ballXdir = -ballXdir;
-            if (ballposY < 0) ballYdir = -ballYdir;
+            if (ballPosX < 0 || ballPosX > 670) ballXDir = -ballXDir;
+            if (ballPosY < 0) ballYDir = -ballYDir;
         }
 
         repaint();
@@ -145,7 +148,10 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         }
 
         if (e.getKeyCode() == KeyEvent.VK_ENTER && !play) {
-            resetGame();
+            frame.getContentPane().removeAll();
+            frame.add(new StartScreen(frame));
+            frame.revalidate();
+            frame.repaint();
         }
     }
 
@@ -160,13 +166,13 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     }
 
     private void resetGame() {
-        ballposX = 120;
-        ballposY = 350;
-        ballXdir = -1;
-        ballYdir = -2;
+        ballPosX = 120;
+        ballPosY = 350;
+        ballXDir = -1;
+        ballYDir = -2;
         score = 0;
         playerX = 310;
-        totalbricks = 21;
+        totalBricks = 21;
         map = new MapGenerator(3, 7);
         repaint();
     }

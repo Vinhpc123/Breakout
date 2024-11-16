@@ -42,7 +42,7 @@ public class StartScreen extends JPanel {
         JButton button = new JButton(text);
         styleButton(button);
         button.addActionListener(e -> {
-            GamePlay gameplay = new GamePlay();
+            GamePlay gameplay = new GamePlay(frame);
             frame.getContentPane().removeAll();
             frame.add(gameplay);
             frame.revalidate();
