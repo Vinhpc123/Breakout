@@ -1,3 +1,5 @@
 com\mycompany\brick\MapGenerator.class
 com\mycompany\brick\MyApp.class
+com\mycompany\brick\StartScreen.class
+com\mycompany\brick\StartScreen$1.class
 com\mycompany\brick\GamePlay.class
