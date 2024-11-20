@@ -2,6 +2,7 @@ package com.mycompany.brick;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridBagConstraints;
@@ -57,7 +58,7 @@ public class StartScreen extends JPanel {
         // Title
         JLabel title = new JLabel("Brick Breaker", SwingConstants.CENTER);
         title.setFont(new Font("Monospaced", Font.BOLD, 48));
-        title.setForeground(new Color(255, 140, 0));
+        title.setForeground(new Color(250, 247, 240));
         add(title, gbc);
 
         // "Start Game" button
@@ -90,6 +91,7 @@ public class StartScreen extends JPanel {
     private JButton createStyledButton(String text, JFrame frame) {
         JButton button = new JButton(text);
         styleButton(button);
+        button.setPreferredSize(new Dimension(170,55));
         button.addActionListener(e -> {
             stopMusic();
             GamePlay gameplay = new GamePlay(frame);
@@ -106,6 +108,7 @@ public class StartScreen extends JPanel {
     private JButton createStyledInstructionsButton(String text, JFrame frame) {
         JButton button = new JButton(text);
         styleButton(button);
+        button.setPreferredSize(new Dimension(170, 55));
         button.addActionListener(e -> {
             JOptionPane.showMessageDialog(frame,
                     "Use the Left and Right arrow keys to move the paddle.\nBreak all the bricks to win!",
@@ -118,6 +121,7 @@ public class StartScreen extends JPanel {
     private JButton createStyledExitButton(String text) {
         JButton button = new JButton(text);
         styleButton(button);
+        button.setPreferredSize(new Dimension(170, 55));
         button.addActionListener(e -> {
             stopMusic();
             System.exit(0);
@@ -126,33 +130,30 @@ public class StartScreen extends JPanel {
     }
 
     // Style button
-
     private void styleButton(JButton button) {
         button.setFont(new Font("Serif", Font.BOLD, 24));
-        button.setBackground(new Color(50, 150, 250));
+        button.setBackground(new Color(154, 126, 111));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(30, 100, 200), 2),
-            BorderFactory.createEmptyBorder(10, 20, 10, 20)
+                BorderFactory.createLineBorder(new Color(154, 126, 111), 2),
+                BorderFactory.createEmptyBorder(10, 20, 10, 20)
         ));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
+
         // Hover effect
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 button.setBackground(new Color(30, 130, 230));
             }
+
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(50, 150, 250));
+                button.setBackground(new Color(154, 126, 111));
             }
         });
     }
-    
-    
-    
 
     // Play background music
     private void playMusic(String musicPath) {
