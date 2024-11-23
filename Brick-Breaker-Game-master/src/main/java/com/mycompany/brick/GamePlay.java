@@ -15,25 +15,25 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class GamePlay extends JPanel implements KeyListener, ActionListener {
-
     private boolean play = false;
     private int score = 0;
-    private int totalBricks = 21;
+    private int totalBricks;
     private Timer timer;
-    private int delay = 8;
-    private JFrame frame; // Reference to the JFrame
+    private int delay;
+    private int level = 1; // Level of the game
+    private JFrame frame;
 
-    private int playerX = 310; // Starting position of paddle
-    private int ballPosX = 120; // Ball X position
-    private int ballPosY = 350; // Ball Y position
-    private int ballXDir = -1; // Ball X direction
-    private int ballYDir = -2; // Ball Y direction
+    private int playerX = 310;
+    private int ballPosX = 120;
+    private int ballPosY = 350;
+    private int ballXDir = -1;
+    private int ballYDir = -2;
 
     private MapGenerator map;
 
     public GamePlay(JFrame frame) {
         this.frame = frame;
-        map = new MapGenerator(3, 7);
+        initLevel(level);
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
@@ -41,13 +41,44 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         timer.start();
     }
 
+    private void initLevel(int level) {
+        // Tăng số lượng hàng và cột của bricks theo level
+        int rows = level + 2; // Tăng rows theo level
+        int cols = 7;
+        
+        // Giảm delay theo level để bóng bay nhanh hơn
+        delay = 8 - level;
+        if (delay < 3) {
+            delay = 3; // Đảm bảo delay không quá thấp
+        }
+    
+        totalBricks = rows * cols;
+        map = new MapGenerator(rows, cols);
+    
+        // Tăng tốc độ bóng theo level bằng cách thay đổi ballXDir và ballYDir
+        // Chỉ thay đổi ballXDir và ballYDir khi màn chơi (level) thay đổi, không thay đổi trong mỗi lần game loop
+        if (level == 1) {
+            ballXDir = -1; // Thiết lập tốc độ mặc định ở level 1
+            ballYDir = -2;
+        } else {
+            ballXDir = -1 - (level / 2);  // Tăng tốc độ X của bóng theo level
+            ballYDir = -2 - (level / 2);  // Tăng tốc độ Y của bóng theo level
+        }
+    
+        // Tạo lại Timer với delay mới
+        timer = new Timer(delay, this);
+        timer.start();  // Khởi động lại Timer
+    }
+    
+    
+
     @Override
     public void paint(Graphics g) {
         // Background
         g.setColor(new Color(20, 20, 40));
         g.fillRect(1, 1, 692, 592);
 
-        // Drawing the bricks
+        // Draw bricks
         map.draw((Graphics2D) g);
 
         // Borders
@@ -56,31 +87,44 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         g.fillRect(0, 0, 692, 3);
         g.fillRect(691, 0, 3, 592);
 
-        // Score
-        g.setColor(new Color(255, 215, 0)); // Gold color
-        g.setFont(new Font("Arial", Font.BOLD, 25));
-        g.drawString("Score: " + score, 550, 30);
+        // Scores and level
+        g.setColor(new Color(255, 215, 0));
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.drawString("Score: " + score, 540, 30);
+                g.drawString("Level: " + level, 20, 30);
+
 
         // Paddle
-        g.setColor(new Color(70, 130, 180)); // Steel blue paddle
+        g.setColor(new Color(70, 130, 180));
         g.fillRect(playerX, 550, 100, 8);
 
         // Ball
-        g.setColor(new Color(255, 69, 0)); // Red-orange ball
+        g.setColor(new Color(255, 69, 0));
         g.fillOval(ballPosX, ballPosY, 20, 20);
 
-        // Game over screen
-        if (ballPosY > 570 || totalBricks == 0) {
+        // Game over
+        if (ballPosY > 570) {
             play = false;
             ballXDir = 0;
             ballYDir = 0;
 
             g.setColor(new Color(255, 69, 0));
             g.setFont(new Font("Serif", Font.BOLD, 40));
-            g.drawString(totalBricks == 0 ? "You Win!" : "Game Over", 230, 300);
+            g.drawString("Game Over", 230, 300);
 
             g.setFont(new Font("Arial", Font.BOLD, 20));
             g.drawString("Press Enter to Restart", 230, 350);
+        }
+
+        // Next level
+        if (totalBricks == 0) {
+            play = false;
+            g.setColor(new Color(0, 255, 0));
+            g.setFont(new Font("Serif", Font.BOLD, 40));
+            g.drawString("Level " + level + " Complete!", 180, 300);
+
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.drawString("Press Enter to Continue", 200, 350);
         }
 
         g.dispose();
@@ -88,33 +132,26 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        timer.start();
-
         if (play) {
-            // Ball and paddle collision
             if (new Rectangle(ballPosX, ballPosY, 20, 20).intersects(new Rectangle(playerX, 550, 100, 8))) {
                 ballYDir = -ballYDir;
             }
 
-            // Ball and bricks collision
+            // Brick collision
             A:
             for (int i = 0; i < map.map.length; i++) {
                 for (int j = 0; j < map.map[0].length; j++) {
                     if (map.map[i][j] > 0) {
                         int brickX = j * map.bricksWidth + 80;
                         int brickY = i * map.bricksHeight + 50;
-                        int bricksWidth = map.bricksWidth;
-                        int bricksHeight = map.bricksHeight;
+                        Rectangle rect = new Rectangle(brickX, brickY, map.bricksWidth, map.bricksHeight);
 
-                        Rectangle rect = new Rectangle(brickX, brickY, bricksWidth, bricksHeight);
-                        Rectangle ballRect = new Rectangle(ballPosX, ballPosY, 20, 20);
-
-                        if (ballRect.intersects(rect)) {
+                        if (new Rectangle(ballPosX, ballPosY, 20, 20).intersects(rect)) {
                             map.setBricksValue(0, i, j);
                             totalBricks--;
                             score += 5;
 
-                            if (ballPosX + 19 <= rect.x || ballPosX + 1 >= rect.x + bricksWidth) {
+                            if (ballPosX + 19 <= rect.x || ballPosX + 1 >= rect.x + map.bricksWidth) {
                                 ballXDir = -ballXDir;
                             } else {
                                 ballYDir = -ballYDir;
@@ -137,48 +174,36 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            if (playerX >= 600) playerX = 600;
-            else moveRight();
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT && playerX < 600) {
+            playerX += 20;
+            play = true;
         }
-
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            if (playerX < 10) playerX = 10;
-            else moveLeft();
+        if (e.getKeyCode() == KeyEvent.VK_LEFT && playerX > 10) {
+            playerX -= 20;
+            play = true;
         }
-
         if (e.getKeyCode() == KeyEvent.VK_ENTER && !play) {
-            frame.getContentPane().removeAll();
-            frame.add(new StartScreen(frame));
-            frame.revalidate();
-            frame.repaint();
+            if (totalBricks == 0) {
+                level++;
+                initLevel(level);
+            } else {
+                level = 1;
+                initLevel(level);
+                score = 0;
+            }
+            ballPosX = 120;
+            ballPosY = 350;
+            ballXDir = -1;
+            ballYDir = -2;
+            playerX = 310;
+            play = true;
+            repaint();
         }
-    }
-
-    private void moveRight() {
-        play = true;
-        playerX += 20;
-    }
-
-    private void moveLeft() {
-        play = true;
-        playerX -= 20;
-    }
-
-    private void resetGame() {
-        ballPosX = 120;
-        ballPosY = 350;
-        ballXDir = -1;
-        ballYDir = -2;
-        score = 0;
-        playerX = 310;
-        totalBricks = 21;
-        map = new MapGenerator(3, 7);
-        repaint();
     }
 
     @Override
     public void keyReleased(KeyEvent e) {}
+
     @Override
     public void keyTyped(KeyEvent e) {}
 }
