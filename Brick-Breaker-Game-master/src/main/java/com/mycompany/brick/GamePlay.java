@@ -4,17 +4,24 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.File;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
 public class GamePlay extends JPanel implements KeyListener, ActionListener {
+
     private boolean play = false;
     private int score = 0;
     private int totalBricks;
@@ -30,6 +37,11 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     private int ballYDir = -2;
 
     private MapGenerator map;
+    private Image backgroundImage; // Image background
+    private Clip ballHitSound; // Sound when ball hits a brick
+    private Clip backgroundMusic; // Background music for the game
+
+    private boolean isMusicOn = true;
 
     public GamePlay(JFrame frame) {
         this.frame = frame;
@@ -39,44 +51,109 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         setFocusTraversalKeysEnabled(false);
         timer = new Timer(delay, this);
         timer.start();
+
+        // Load background image for the game
+        backgroundImage = loadImage("resources/images/BG_Lvl2.gif");
+
+        // Play background music
+        playBackgroundMusic("resources/sounds/WinBGM.wav");
+
+        // Load sound for ball hitting a brick
+        loadBallHitSound("resources/sounds/Click.wav");
     }
 
     private void initLevel(int level) {
-        // Tăng số lượng hàng và cột của bricks theo level
-        int rows = level + 2; // Tăng rows theo level
+        int rows = level + 2;
         int cols = 7;
-        
-        // Giảm delay theo level để bóng bay nhanh hơn
         delay = 8 - level;
         if (delay < 3) {
-            delay = 3; // Đảm bảo delay không quá thấp
+            delay = 3;
         }
-    
+
         totalBricks = rows * cols;
         map = new MapGenerator(rows, cols);
-    
-        // Tăng tốc độ bóng theo level bằng cách thay đổi ballXDir và ballYDir
-        // Chỉ thay đổi ballXDir và ballYDir khi màn chơi (level) thay đổi, không thay đổi trong mỗi lần game loop
+
+        // Increase ball speed based on the level
         if (level == 1) {
-            ballXDir = -1; // Thiết lập tốc độ mặc định ở level 1
-            ballYDir = -2;
+            ballXDir = -1;
+            ballYDir = -1;
         } else {
-            ballXDir = -1 - (level / 2);  // Tăng tốc độ X của bóng theo level
-            ballYDir = -2 - (level / 2);  // Tăng tốc độ Y của bóng theo level
+            ballXDir = -1 - (level / 2);
+            ballYDir = -2 - (level / 2);
         }
-    
-        // Tạo lại Timer với delay mới
+
+        // Create a new timer with updated delay
         timer = new Timer(delay, this);
-        timer.start();  // Khởi động lại Timer
+        timer.start();
     }
-    
-    
+
+    private void playBackgroundMusic(String musicPath) {
+        try {
+            File musicFile = new File(musicPath);
+            if (!musicFile.exists()) {
+                System.err.println("Music file not found: " + musicFile.getAbsolutePath());
+                return;
+            }
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
+            backgroundMusic = AudioSystem.getClip();
+            backgroundMusic.open(audioStream);
+            backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+            backgroundMusic.start();
+        } catch (Exception e) {
+            System.err.println("Error playing background music: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private void loadBallHitSound(String soundPath) {
+        try {
+            File soundFile = new File(soundPath);
+            if (!soundFile.exists()) {
+                System.err.println("Sound file not found: " + soundFile.getAbsolutePath());
+                return;
+            }
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(soundFile);
+            ballHitSound = AudioSystem.getClip();
+            ballHitSound.open(audioStream);
+        } catch (Exception e) {
+            System.err.println("Error loading ball hit sound: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private Image loadImage(String path) {
+        Image img = Toolkit.getDefaultToolkit().getImage(path);
+        if (img == null) {
+            System.err.println("Image not found: " + path);
+        }
+        return img;
+    }
+
+    private void stopMusic() {
+        if (backgroundMusic != null && backgroundMusic.isRunning()) {
+            backgroundMusic.stop();
+        }
+    }
+
+    private void toggleMusic() {
+        if (isMusicOn) {
+            stopMusic();
+            isMusicOn = false;
+        } else {
+            playBackgroundMusic("resources/sounds/WinBGM.wav");
+            isMusicOn = true;
+        }
+        repaint(); // Redraw to update icon
+    }
 
     @Override
     public void paint(Graphics g) {
+        super.paint(g);
+
         // Background
-        g.setColor(new Color(20, 20, 40));
-        g.fillRect(1, 1, 692, 592);
+        if (backgroundImage != null) {
+            g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+        }
 
         // Draw bricks
         map.draw((Graphics2D) g);
@@ -91,8 +168,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         g.setColor(new Color(255, 215, 0));
         g.setFont(new Font("Arial", Font.BOLD, 20));
         g.drawString("Score: " + score, 540, 30);
-                g.drawString("Level: " + level, 20, 30);
-
+        g.drawString("Level: " + level, 20, 30);
 
         // Paddle
         g.setColor(new Color(70, 130, 180));
@@ -151,7 +227,13 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
                             totalBricks--;
                             score += 5;
 
-                            if (ballPosX + 19 <= rect.x || ballPosX + 1 >= rect.x + map.bricksWidth) {
+                            // Kiểm tra nếu ballHitSound không phải null trước khi phát âm thanh
+                            if (ballHitSound != null) {
+                                ballHitSound.setFramePosition(0); // Đảm bảo âm thanh phát từ đầu
+                                ballHitSound.start();
+                            }
+
+                            if (ballPosX + 19 <= rect.x || ballPosX + 1 >= rect.x + rect.width) {
                                 ballXDir = -ballXDir;
                             } else {
                                 ballYDir = -ballYDir;
@@ -165,10 +247,18 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             ballPosX += ballXDir;
             ballPosY += ballYDir;
 
-            if (ballPosX < 0 || ballPosX > 670) ballXDir = -ballXDir;
-            if (ballPosY < 0) ballYDir = -ballYDir;
-        }
+            if (ballPosX < 0) {
+                ballXDir = -ballXDir;
+            }
 
+            if (ballPosY < 0) {
+                ballYDir = -ballYDir;
+            }
+
+            if (ballPosX > 670) {
+                ballXDir = -ballXDir;
+            }
+        }
         repaint();
     }
 
@@ -182,28 +272,41 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             playerX -= 20;
             play = true;
         }
-        if (e.getKeyCode() == KeyEvent.VK_ENTER && !play) {
-            if (totalBricks == 0) {
-                level++;
-                initLevel(level);
-            } else {
-                level = 1;
-                initLevel(level);
-                score = 0;
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            if (!play) {
+                if (ballPosY > 570) {
+                    level = 1; // Quay lại cấp độ 1
+                    score = 0; // Reset điểm số
+                    initLevel(level); // Khởi tạo lại cấp độ
+                    ballPosX = 120;
+                    ballPosY = 350;
+                    ballXDir = -1;  // Reset hướng bóng
+                    ballYDir = -2;  // Reset hướng bóng
+                    play = true; // Bắt đầu trò chơi
+                    repaint();
+                } else {
+                    level++;
+                    initLevel(level);
+                    score = 0;
+                    ballPosX = 120;
+                    ballPosY = 350;
+                    ballXDir = -1;
+                    ballYDir = -2;
+                    play = true;
+                    repaint();
+                }
             }
-            ballPosX = 120;
-            ballPosY = 350;
-            ballXDir = -1;
-            ballYDir = -2;
-            playerX = 310;
-            play = true;
-            repaint();
+        }
+        if (e.getKeyCode() == KeyEvent.VK_M) {
+            toggleMusic();
         }
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {}
+    public void keyReleased(KeyEvent e) {
+    }
 
     @Override
-    public void keyTyped(KeyEvent e) {}
+    public void keyTyped(KeyEvent e) {
+    }
 }

@@ -38,17 +38,17 @@ public class StartScreen extends JPanel {
         setBackground(new Color(20, 20, 40));
 
         // Load background image from resources
-        backgroundImage = loadImage("D://Java/Brick-Breaker-Game-master/resources/images/backgr.png");
+        backgroundImage = loadImage("resources/images/backgr.png");
 
         // Load music on/off icons
-        musicOnIcon = loadImage("D://Java/Brick-Breaker-Game-master/resources/images/musicon.png");
-        musicOffIcon = loadImage("D://Java/Brick-Breaker-Game-master/resources/images/musicoff.png");
+        musicOnIcon = loadImage("resources/images/musicon.png");
+        musicOffIcon = loadImage("resources/images/musicoff.png");
 
         // Click area to toggle music
         musicToggleArea = new Rectangle(650, 10, 30, 30);
 
         // Play background music from resources
-        playMusic("D://Java/Brick-Breaker-Game-master/resources/sounds/MainMenuBGM.wav");
+        playMusic("resources/sounds/MainMenuBGM.wav");
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(20, 20, 20, 20);
@@ -91,7 +91,7 @@ public class StartScreen extends JPanel {
     private JButton createStyledButton(String text, JFrame frame) {
         JButton button = new JButton(text);
         styleButton(button);
-        button.setPreferredSize(new Dimension(170,55));
+        button.setPreferredSize(new Dimension(170, 55));
         button.addActionListener(e -> {
             stopMusic();
             GamePlay gameplay = new GamePlay(frame);
