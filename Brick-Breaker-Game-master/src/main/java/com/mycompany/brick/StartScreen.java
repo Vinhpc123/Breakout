@@ -187,7 +187,7 @@ public class StartScreen extends JPanel {
             stopMusic();
             isMusicOn = false;
         } else {
-            playMusic("D://Java/Brick-Breaker-Game-master/resources/sounds/MainMenuBGM.wav");
+            playMusic("resources/sounds/MainMenuBGM.wav");
             isMusicOn = true;
         }
         repaint(); // Redraw to update icon

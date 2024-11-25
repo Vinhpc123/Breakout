@@ -18,6 +18,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class GamePlay extends JPanel implements KeyListener, ActionListener {
@@ -30,6 +31,8 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     private int delay;
     private int level = 1; // Bắt đầu từ màn 1
     private JFrame frame;
+    private long lastHitTime = 0;  // Thời gian của lần phát âm thanh trước
+    private static final long SOUND_DELAY = 200;  // Đặt thời gian tối thiểu giữa các lần phát âm thanh (200 ms)
 
     private int playerX = 310;
     private int ballPosX = 120;
@@ -59,9 +62,17 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         loadBallHitSound("resources/sounds/Click.wav");
     }
 
+    public GamePlay(JFrame frame2, int score2) {
+        //TODO Auto-generated constructor stub
+    }
+
+    public GamePlay(JFrame frame2, int nextLevel, int score2) {
+        //TODO Auto-generated constructor stub
+    }
+
     private void initLevel(int level) {
         int rows = level + 2; // Số hàng gạch tăng theo level
-        int cols = 7;         // Số cột gạch cố định
+        int cols = 1;         // Số cột gạch cố định
 
         // Điều chỉnh độ trễ dựa trên level
         if (level == 1) {
@@ -69,7 +80,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         } else if (level == 2) {
             delay = 15;  // Tăng nhẹ tốc độ ở màn 2
         } else {
-            delay = Math.max(15 - level, 3); // Tăng tốc độ từ từ từ màn 3 trở đi
+            delay = 15; // Tăng tốc độ nhanh nhất ở màn 3
         }
 
         totalBricks = rows * cols;  // Tổng số gạch
@@ -81,13 +92,15 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             ballYDir = -1;
         } else if (level == 2) {
             ballXDir = -1; // Tăng nhẹ tốc độ ở màn 2
-            ballYDir = -1;
+            ballYDir = -2;
         } else {
-            ballXDir = -1 - (level / 2); // Tăng tốc độ từ từ từ màn 3
-            ballYDir = -1 - (level / 2);
+            ballXDir = -2; // Tăng tốc độ nhiều hơn ở màn 3
+            ballYDir = -3;
         }
 
-        timer = new Timer(delay, this);  // Tạo bộ hẹn giờ mới
+        totalBricks = rows * cols;  // Tổng số gạch
+        map = new MapGenerator(rows, cols);  // Khởi tạo bản đồ gạch
+        timer = new Timer(delay, this);  // Tạo lại bộ hẹn giờ mới với tốc độ hiện tại
         timer.start();  // Bắt đầu bộ hẹn giờ
     }
 
@@ -181,30 +194,24 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             play = false;
             ballXDir = 0;
             ballYDir = 0;
-            g.setColor(new Color(255, 69, 0));
-            g.setFont(new Font("Serif", Font.BOLD, 40));
-            g.drawString("Game Over", 230, 300);
-            g.setFont(new Font("Arial", Font.BOLD, 20));
-            g.drawString("Press Enter to Restart", 230, 350);
+            showGameOverScreen();
         }
 
         if (totalBricks == 0) {
             if (level == 3) {
                 // Chiến thắng màn cuối
                 play = false;
-                g.setColor(new Color(0, 255, 0));
-                g.setFont(new Font("Serif", Font.BOLD, 40));
-                g.drawString("You Win!", 230, 300);
-                g.setFont(new Font("Arial", Font.BOLD, 20));
-                g.drawString("Press Enter to Restart", 230, 350);
+                showWinScreen();
+
             } else {
                 // Hoàn thành 1 màn chơi
                 play = false;
                 g.setColor(new Color(0, 255, 0));
                 g.setFont(new Font("Serif", Font.BOLD, 40));
-                g.drawString("Level " + level + " Complete!", 180, 300);
-                g.setFont(new Font("Arial", Font.BOLD, 20));
-                g.drawString("Press Enter to Continue", 200, 350);
+                g.drawString(" Level " + level + " Hoàn Thành!", 180, 300);
+                g.setFont(new Font("Arial", Font.BOLD, 20
+                ));
+                g.drawString("Nhấn Phím Enter Để Chơi Màn Tiếp Theo!", 175, 350);
             }
         }
 
@@ -215,6 +222,26 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         }
 
         g.dispose();
+    }
+
+    private void showWinScreen() {
+        // Hiển thị màn hình "You Win" khi người chơi hoàn thành màn chơi
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        YouWin youWinScreen = new YouWin(frame, score, ballPosX); // Chuyển điểm số đến màn hình "You Win"
+        frame.getContentPane().removeAll();  // Xóa nội dung cũ
+        frame.add(youWinScreen);  // Thêm màn hình "You Win" vào frame
+        frame.revalidate();  // Cập nhật lại layout
+        frame.repaint();  // Vẽ lại màn hình
+    }
+
+    private void showGameOverScreen() {
+        // Chuyển màn hình sang GameOver
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        GameOver gameOverScreen = new GameOver(frame, score, 0); // Truyền điểm số hiện tại vào GameOver
+        frame.getContentPane().removeAll(); // Xóa các thành phần hiện tại
+        frame.add(gameOverScreen); // Thêm GameOver
+        frame.revalidate(); // Cập nhật lại giao diện
+        frame.repaint();
     }
 
     @Override
@@ -238,10 +265,14 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
                             totalBricks--;
                             score += 5;
 
-                            // Phát âm thanh khi bóng va vào gạch
-                            if (ballHitSound != null) {
-                                ballHitSound.setFramePosition(0);  // Đặt lại vị trí âm thanh
-                                ballHitSound.start();  // Phát âm thanh
+                            // Kiểm tra và phát âm thanh nếu đủ thời gian
+                            long currentTime = System.currentTimeMillis();
+                            if (currentTime - lastHitTime > SOUND_DELAY) {
+                                if (ballHitSound != null) {
+                                    ballHitSound.setFramePosition(0);  // Đặt lại vị trí âm thanh
+                                    ballHitSound.start();  // Phát âm thanh
+                                }
+                                lastHitTime = currentTime;  // Cập nhật thời gian phát âm thanh
                             }
 
                             // Thay đổi hướng bóng dựa trên phía va chạm
@@ -274,6 +305,28 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         repaint();
     }
 
+    public void restartGame() {
+        // Reset toàn bộ trạng thái trò chơi
+        level = 1;  // Quay lại màn đầu tiên
+        score = 0;  // Reset điểm số
+        totalBricks = 21;  // Đặt lại tổng số gạch
+        map = new MapGenerator(3, 7);  // Tạo lại bản đồ gạch
+        ballPosX = 120;  // Vị trí ban đầu của bóng
+        ballPosY = 350;
+        ballXDir = -1;  // Hướng ban đầu của bóng
+        ballYDir = -2;
+        playerX = 310;  // Đặt thanh ngang về vị trí ban đầu
+
+        // Đặt lại trạng thái chơi và bộ đếm thời gian
+        play = true;
+        paused = false;  // Không tạm dừng
+        initLevel(level);  // Khởi tạo màn chơi
+
+        requestFocus(); // Đảm bảo JPanel nhận input từ bàn phím
+
+        repaint();  // Làm mới giao diện
+    }
+
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_RIGHT && playerX < 600) {
@@ -288,15 +341,18 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             if (!play) {
                 if (ballPosY > 570) {
                     // Reset game
-                    level = 1;
-                    score = 0;
-                    totalBricks = 21;
-                    map = new MapGenerator(3, 7);
-                    ballPosX = 120;
+                    level = 1;  // Đặt lại level về màn đầu
+                    score = 0;  // Reset điểm số
+                    totalBricks = 21;  // Đặt lại tổng số gạch ban đầu
+                    map = new MapGenerator(3, 7);  // Khởi tạo bản đồ gạch ban đầu
+                    ballPosX = 120;  // Vị trí ban đầu của bóng
                     ballPosY = 350;
-                    ballXDir = -1;
-                    ballYDir = -2;
-                    playerX = 310;
+                    ballXDir = -1;  // Đặt lại tốc độ của bóng
+                    ballYDir = -2;  // Đặt lại tốc độ của bóng
+                    playerX = 310;  // Vị trí ban đầu của người chơi
+
+                    // Khởi tạo lại mức độ và các tham số liên quan đến game
+                    initLevel(level);
                 } else if (totalBricks == 0) {
                     // Next level
                     if (level < 3) {
@@ -309,6 +365,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
                 play = true;
             }
         }
+
         if (e.getKeyCode() == KeyEvent.VK_P) {
             paused = !paused;
         }
