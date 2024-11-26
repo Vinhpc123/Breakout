@@ -6,12 +6,12 @@ Project: Game Brick Breaker
 
 ![image](https://github.com/user-attachments/assets/1872d0a0-2cbc-42a4-90c6-e48a2ec90455)
 
--Key Features:
-+Điều Khiển Thanh Trượt: Sử dụng bàn phím để di chuyển thanh trượt sang trái và phải.
-+Bóng Tương Tác: Bóng bật lại khi va vào các khối gạch, thanh trượt và các cạnh của màn hình.
-+Gạch Phá Hủy: Các khối gạch biến mất khi bị bóng chạm vào.
-+Điều Chỉnh Tốc Độ: Tốc độ bóng tăng dần qua các màn chơi, tạo thêm thách thức.
-+Giao Diện Đồ Họa: Sử dụng thư viện Java Swing để hiển thị trò chơi với đồ họa mượt mà.
+          -Key Features:
+          +Điều Khiển Thanh Trượt: Sử dụng bàn phím để di chuyển thanh trượt sang trái và phải.
+          +Bóng Tương Tác: Bóng bật lại khi va vào các khối gạch, thanh trượt và các cạnh của màn hình.
+          +Gạch Phá Hủy: Các khối gạch biến mất khi bị bóng chạm vào.
+          +Điều Chỉnh Tốc Độ: Tốc độ bóng tăng dần qua các màn chơi, tạo thêm thách thức.
+          +Giao Diện Đồ Họa: Sử dụng thư viện Java Swing để hiển thị trò chơi với đồ họa mượt mà.
 
 
 - Technologies Used:
