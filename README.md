@@ -29,4 +29,5 @@ Project: Game Brick Breaker
   Hiệu Ứng Đồ Họa: Tăng cường hiệu ứng hình ảnh khi bóng va vào gạch.<br>
   Tính Năng Multiplayer: Cho phép hai người chơi cạnh tranh với nhau trên cùng một màn hình.<br>
 
+------------------------------------------------------------------------------------------------------------------------------------------
 Sample: Github Repository Link
