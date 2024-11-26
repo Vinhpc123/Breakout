@@ -26,60 +26,61 @@ import javax.swing.SwingConstants;
 
 public class StartScreen extends JPanel {
 
-    private Image backgroundImage; // Background image
-    private Image musicOnIcon; // Music on icon
-    private Image musicOffIcon; // Music off icon
-    private Clip backgroundMusic; // Background music
-    private boolean isMusicOn = true; // Music status (on/off)
-    private Rectangle musicToggleArea; // Area to click to toggle music
+    private Image backgroundImage; // Hình nền
+    private Image musicOnIcon; // Icon bật nhạc
+    private Image musicOffIcon; // Icon tắt nhạc
+    private Clip backgroundMusic; // Nhạc nền
+    private boolean isMusicOn = true; // Trạng thái nhạc (bật/tắt)
+    private Rectangle musicToggleArea; // Vùng để click bật/tắt nhạc
 
     public StartScreen(JFrame frame) {
         setLayout(new GridBagLayout());
-        setBackground(new Color(20, 20, 40));
+        setBackground(new Color(20, 20, 40)); // Đặt màu nền
 
-        // Load background image from resources
+        // Tải hình nền từ thư mục "resources"
         backgroundImage = loadImage("resources/images/backgr.png");
 
-        // Load music on/off icons
+        // Tải icon bật/tắt nhạc
         musicOnIcon = loadImage("resources/images/musicon.png");
         musicOffIcon = loadImage("resources/images/musicoff.png");
 
-        // Click area to toggle music
+        // Định nghĩa vùng để click bật/tắt nhạc
         musicToggleArea = new Rectangle(650, 10, 30, 30);
 
-        // Play background music from resources
+        // Phát nhạc nền từ tệp trong thư mục "resources"
         playMusic("resources/sounds/MainMenuBGM.wav");
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(20, 20, 20, 20);
+        gbc.insets = new Insets(20, 20, 20, 20); // Khoảng cách giữa các phần tử giao diện
         gbc.gridx = 0;
         gbc.gridy = 0;
 
-        // Title
+        // Tiêu đề game
         JLabel title = new JLabel("Brick Breaker", SwingConstants.CENTER);
-        title.setFont(new Font("Monospaced", Font.BOLD, 48));
-        title.setForeground(new Color(250, 247, 240));
+        title.setFont(new Font("Monospaced", Font.BOLD, 48)); // Đặt font chữ lớn
+        title.setForeground(new Color(250, 247, 240)); // Đặt màu chữ
         add(title, gbc);
 
-        // "Start Game" button
+        // Nút "Start Game" để bắt đầu trò chơi
         JButton startButton = createStyledButton("Start Game", frame);
         gbc.gridy = 1;
         add(startButton, gbc);
 
-        // "Instructions" button
+        // Nút "Instructions" để xem hướng dẫn
         JButton instructionsButton = createStyledInstructionsButton("Instructions", frame);
         gbc.gridy = 2;
         add(instructionsButton, gbc);
 
-        // "Exit Game" button
+        // Nút "Exit Game" để thoát game
         JButton exitButton = createStyledExitButton("Exit Game");
         gbc.gridy = 3;
         add(exitButton, gbc);
 
-        // Listen for mouse events
+        // Thêm sự kiện lắng nghe click chuột
         addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
+                // Nếu click vào vùng bật/tắt nhạc, thực hiện chức năng toggle
                 if (musicToggleArea.contains(e.getPoint())) {
                     toggleMusic();
                 }
@@ -87,119 +88,122 @@ public class StartScreen extends JPanel {
         });
     }
 
-    // Create "Start Game" button
+    // Hàm tạo nút "Start Game"
     private JButton createStyledButton(String text, JFrame frame) {
         JButton button = new JButton(text);
-        styleButton(button);
-        button.setPreferredSize(new Dimension(170, 55));
+        styleButton(button); // Áp dụng phong cách cho nút
+        button.setPreferredSize(new Dimension(170, 55)); // Đặt kích thước cho nút
         button.addActionListener(e -> {
-            stopMusic();
+            stopMusic(); // Dừng nhạc nền khi vào trò chơi
             GamePlay gameplay = new GamePlay(frame);
-            frame.getContentPane().removeAll();
-            frame.add(gameplay);
-            frame.revalidate();
-            frame.repaint();
-            gameplay.requestFocusInWindow();
+            frame.getContentPane().removeAll(); // Xóa giao diện hiện tại
+            frame.add(gameplay); // Thêm giao diện chơi game
+            frame.revalidate(); // Cập nhật lại giao diện
+            frame.repaint(); // Vẽ lại giao diện
+            gameplay.requestFocusInWindow(); // Đưa con trỏ vào vùng game
         });
         return button;
     }
 
-    // Create "Instructions" button
+    // Hàm tạo nút "Instructions"
     private JButton createStyledInstructionsButton(String text, JFrame frame) {
         JButton button = new JButton(text);
-        styleButton(button);
-        button.setPreferredSize(new Dimension(170, 55));
+        styleButton(button); // Áp dụng phong cách cho nút
+        button.setPreferredSize(new Dimension(170, 55)); // Đặt kích thước cho nút
         button.addActionListener(e -> {
             JOptionPane.showMessageDialog(frame,
-                    "Sử dụng các phím mũi tên Trái và Phải để di chuyển thanh ngang.\n Phá vỡ tất cả các viên gạch để giành chiến thắng!.\n Nhấn phím p nếu muốn bạn muốn tạm dừng trò chơi ! .\n Nhấn phím m nếu bạn muốn tắt nhạc nền lúc chơi !",
+                    // Thông báo hướng dẫn chơi game
+                    "Sử dụng các phím mũi tên Trái và Phải để di chuyển thanh ngang.\n"
+                            + "Phá vỡ tất cả các viên gạch để giành chiến thắng!\n"
+                            + "Nhấn phím P nếu muốn tạm dừng trò chơi!\n"
+                            + "Nhấn phím M nếu bạn muốn tắt nhạc nền lúc chơi!",
                     "Instructions", JOptionPane.INFORMATION_MESSAGE);
         });
         return button;
     }
 
-    // Create "Exit Game" button
+    // Hàm tạo nút "Exit Game"
     private JButton createStyledExitButton(String text) {
         JButton button = new JButton(text);
-        styleButton(button);
-        button.setPreferredSize(new Dimension(170, 55));
+        styleButton(button); // Áp dụng phong cách cho nút
+        button.setPreferredSize(new Dimension(170, 55)); // Đặt kích thước cho nút
         button.addActionListener(e -> {
-            stopMusic();
-            System.exit(0);
+            stopMusic(); // Dừng nhạc trước khi thoát game
+            System.exit(0); // Thoát chương trình
         });
         return button;
     }
 
-    // Style button
+    // Phong cách cho các nút
     private void styleButton(JButton button) {
-        button.setFont(new Font("Serif", Font.BOLD, 24));
-        button.setBackground(new Color(154, 126, 111));
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
+        button.setFont(new Font("Serif", Font.BOLD, 24)); // Đặt font chữ
+        button.setBackground(new Color(154, 126, 111)); // Đặt màu nền
+        button.setForeground(Color.WHITE); // Đặt màu chữ
+        button.setFocusPainted(false); // Ẩn viền focus
         button.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(new Color(154, 126, 111), 2),
-                BorderFactory.createEmptyBorder(10, 20, 10, 20)
-        ));
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                BorderFactory.createEmptyBorder(10, 20, 10, 20))); // Đặt viền và padding
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR)); // Đổi con trỏ chuột
 
-        // Hover effect
+        // Hiệu ứng hover (khi chuột di qua)
         button.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(30, 130, 230));
+                button.setBackground(new Color(30, 130, 230)); // Đổi màu khi hover
             }
 
             @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(new Color(154, 126, 111));
+                button.setBackground(new Color(154, 126, 111)); // Trả lại màu cũ
             }
         });
     }
 
-    // Play background music
+    // Phát nhạc nền
     private void playMusic(String musicPath) {
         try {
             File musicFile = new File(musicPath);
             if (!musicFile.exists()) {
-                System.err.println("Music file not found: " + musicFile.getAbsolutePath());
+                System.err.println("Không tìm thấy file nhạc: " + musicFile.getAbsolutePath());
                 return;
             }
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(musicFile);
             backgroundMusic = AudioSystem.getClip();
             backgroundMusic.open(audioStream);
-            backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+            backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY); // Phát lặp lại liên tục
             backgroundMusic.start();
         } catch (Exception e) {
-            System.err.println("Error playing music: " + e.getMessage());
+            System.err.println("Lỗi phát nhạc: " + e.getMessage());
             e.printStackTrace();
         }
     }
 
-    // Stop background music
+    // Dừng nhạc nền
     private void stopMusic() {
         if (backgroundMusic != null && backgroundMusic.isRunning()) {
             backgroundMusic.stop();
         }
     }
 
-    // Toggle background music
+    // Bật/tắt nhạc
     private void toggleMusic() {
         if (isMusicOn) {
-            stopMusic();
+            stopMusic(); // Dừng nhạc nếu đang bật
             isMusicOn = false;
         } else {
-            playMusic("resources/sounds/MainMenuBGM.wav");
+            playMusic("resources/sounds/MainMenuBGM.wav"); // Phát lại nhạc nếu đang tắt
             isMusicOn = true;
         }
-        repaint(); // Redraw to update icon
+        repaint(); // Cập nhật lại giao diện
     }
 
-    // Load image
+    // Tải hình ảnh
     private Image loadImage(String path) {
         File file = new File(path);
         if (file.exists()) {
             return Toolkit.getDefaultToolkit().getImage(file.getAbsolutePath());
         } else {
-            System.err.println("Image not found: " + path);
+            System.err.println("Không tìm thấy hình ảnh: " + path);
             return null;
         }
     }
@@ -208,12 +212,12 @@ public class StartScreen extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Draw background image
+        // Vẽ hình nền
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         }
 
-        // Draw music on/off icon
+        // Vẽ icon bật/tắt nhạc
         if (isMusicOn) {
             g.drawImage(musicOnIcon, musicToggleArea.x, musicToggleArea.y, musicToggleArea.width, musicToggleArea.height, this);
         } else {

@@ -4,31 +4,33 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import com.mycompany.brick.GamePlay; // Thêm import cho GamePlay
-import com.mycompany.brick.StartScreen; // Thêm import cho StartScreen
+import com.mycompany.brick.GamePlay; // Import lớp GamePlay
+import com.mycompany.brick.StartScreen; // Import lớp StartScreen
 
+// Lớp GameOver kế thừa từ JPanel, dùng để hiển thị màn hình Game Over
 public class GameOver extends JPanel {
 
-    private int score;
+    private int score; // Biến lưu điểm số của người chơi
 
-    private Image gameOverImage; // Hình ảnh Game Over
+    private Image gameOverImage; // Hình ảnh hiển thị khi Game Over
 
-    private JButton restartButton;
-    private JButton homeButton;
-    private JButton exitButton;
+    private JButton restartButton; // Nút để chơi lại
+    private JButton homeButton; // Nút để quay về màn hình chính
+    private JButton exitButton; // Nút để thoát game
 
+    // Constructor cho GameOver, nhận JFrame, điểm số và một số tham số khác (cps)
     public GameOver(JFrame frame, int score, int cps) {
-        this.score = score;
+        this.score = score; // Gán điểm số cho biến score
 
-        setLayout(null); // Layout null để dễ dàng điều chỉnh các nút
+        setLayout(null); // Sử dụng layout null để dễ dàng điều chỉnh vị trí các nút
 
-        // Tải hình ảnh Game Over
+        // Tải hình nền Game Over
         gameOverImage = loadImage("resources/images/GameOverBackground.gif");
 
         // Khởi tạo các nút
-        restartButton = createButton("Play Again", 250, 350, 200, 50);
-        homeButton = createButton("Home", 250, 425, 200, 50);
-        exitButton = createButton("Exit", 250, 500, 200, 50);
+        restartButton = createButton("Play Again", 250, 350, 200, 50); // Nút chơi lại
+        homeButton = createButton("Home", 250, 425, 200, 50); // Nút về màn hình chính
+        exitButton = createButton("Exit", 250, 500, 200, 50); // Nút thoát game
 
         // Thêm các nút vào panel
         add(restartButton);
@@ -36,97 +38,101 @@ public class GameOver extends JPanel {
         add(exitButton);
     }
 
+    // Constructor khác (tạm thời không sử dụng)
     public GameOver(JFrame frame, int score2) {
-        //TODO Auto-generated constructor stub
+        // TODO Auto-generated constructor stub
     }
 
+    // Ghi đè phương thức paintComponent để vẽ giao diện Game Over
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Vẽ nền mờ
-        g.setColor(new Color(0, 0, 0, 150));
-        g.fillRect(0, 0, getWidth(), getHeight());
+        // Vẽ nền mờ phía sau
+        g.setColor(new Color(0, 0, 0, 150)); // Màu đen với độ trong suốt
+        g.fillRect(0, 0, getWidth(), getHeight()); // Vẽ hình chữ nhật phủ toàn màn hình
 
         // Vẽ hình ảnh Game Over
         if (gameOverImage != null) {
             g.drawImage(gameOverImage, getWidth() / 3, getHeight() / 14, 225, 200, this);
         }
 
-        // Chỉnh sửa thiết kế của Score
+        // Tạo chuỗi hiển thị điểm số
         String scoreText = "Score: " + score;
 
-        // Chuyển đổi Graphics thành Graphics2D để sử dụng các hiệu ứng nâng cao
+        // Sử dụng Graphics2D để vẽ chữ với hiệu ứng
         Graphics2D g2d = (Graphics2D) g;
 
-        // Sử dụng anti-aliasing cho chữ để mượt mà hơn
+        // Bật anti-aliasing để làm mịn chữ
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        // Tạo một Gradient cho màu chữ
+        // Tạo hiệu ứng gradient cho chữ (màu chuyển từ vàng sang đỏ)
         GradientPaint gradient = new GradientPaint(0, 0, Color.YELLOW, 0, getHeight(), Color.RED);
         g2d.setPaint(gradient);
 
-        // Tăng kích thước và thay đổi font chữ
+        // Thay đổi font chữ và kích thước
         Font scoreFont = new Font("Arial", Font.BOLD, 50);
         g2d.setFont(scoreFont);
 
-        // Tính toán vị trí Y của Score sao cho nằm giữa "Game Over" và "Play Again"
-        int imageBottomY = getHeight() / 14 + 200; // Dưới cùng của hình ảnh Game Over
-        int buttonTopY = 380; // Vị trí của nút "Play Again"
-        int scoreY = (imageBottomY + buttonTopY) / 2; // Trung bình giữa hình ảnh và nút Play Again
+        // Tính toán vị trí Y để đặt điểm số nằm giữa hình ảnh Game Over và nút
+        int imageBottomY = getHeight() / 14 + 200; // Điểm dưới cùng của hình ảnh Game Over
+        int buttonTopY = 380; // Điểm trên cùng của nút "Play Again"
+        int scoreY = (imageBottomY + buttonTopY) / 2; // Vị trí trung bình
 
-        // Vẽ chữ Score với bóng
-        int x = getWidth() / 3;  // 1/3 of the width to center the score
-        int shadowOffset = 5; // Độ offset cho bóng
+        // Vẽ bóng cho chữ điểm số
+        int x = getWidth() / 3; // Tọa độ X để căn giữa
+        int shadowOffset = 5; // Khoảng cách bóng đổ
 
-        // Vẽ bóng cho chữ Score
+        // Vẽ bóng cho chữ
         g2d.setColor(Color.BLACK);
         g2d.drawString(scoreText, x + shadowOffset, scoreY + shadowOffset);
 
-        // Vẽ chữ Score chính
+        // Vẽ chữ điểm số chính
         g2d.setColor(Color.WHITE);
         g2d.drawString(scoreText, x, scoreY);
     }
 
+    // Phương thức tạo nút với hiệu ứng đặc biệt
     private JButton createButton(String text, int x, int y, int width, int height) {
         JButton button = new JButton(text) {
             @Override
             protected void paintComponent(Graphics g) {
+                // Thay đổi màu sắc nút khi hover hoặc nhấn
                 if (getModel().isPressed()) {
-                    g.setColor(new Color(154, 126, 111).darker()); // Darker color on press
+                    g.setColor(new Color(154, 126, 111).darker()); // Màu tối hơn khi nhấn
                 } else if (getModel().isRollover()) {
-                    g.setColor(new Color(154, 126, 111).brighter()); // Brighter color on hover
+                    g.setColor(new Color(154, 126, 111).brighter()); // Màu sáng hơn khi hover
                 } else {
-                    g.setColor(new Color(154, 126, 111)); // Normal color
+                    g.setColor(new Color(154, 126, 111)); // Màu mặc định
                 }
 
-                // Draw rounded button background with gradient
+                // Vẽ nền nút với góc bo tròn
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                g2d.setColor(getBackground());
-                g2d.fillRoundRect(0, 0, width, height, 30, 30); // Round corners with radius 30
+                g2d.fillRoundRect(0, 0, width, height, 30, 30); // Góc bo tròn 30px
 
-                super.paintComponent(g); // Call the default paint to render text
+                super.paintComponent(g); // Gọi phương thức paint mặc định để hiển thị chữ
             }
         };
 
+        // Cấu hình thuộc tính của nút
         button.setBounds(x, y, width, height);
         button.setFont(new Font("Serif", Font.BOLD, 20));
         button.setForeground(Color.BLACK);
         button.setFocusPainted(false);
-        button.setBorderPainted(false); // No border
-        button.setContentAreaFilled(false); // To make background transparent
+        button.setBorderPainted(false); // Không viền
+        button.setContentAreaFilled(false); // Không tô nền mặc định
 
-        // Add action listener for button functionality
+        // Thêm sự kiện cho nút
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (text.equals("Play Again")) {
+                if (text.equals("Play Again")) { // Nếu bấm nút "Play Again"
                     restartGame();
-                } else if (text.equals("Home")) {
+                } else if (text.equals("Home")) { // Nếu bấm nút "Home"
                     goHome();
-                } else if (text.equals("Exit")) {
-                    System.exit(0);
+                } else if (text.equals("Exit")) { // Nếu bấm nút "Exit"
+                    System.exit(0); // Thoát chương trình
                 }
             }
         });
@@ -134,37 +140,34 @@ public class GameOver extends JPanel {
         return button;
     }
 
+    // Phương thức để chơi lại game
     private void restartGame() {
-
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        GamePlay gamePlay1 = new GamePlay(frame);  // Tạo đối tượng GamePlay mới
+        GamePlay gamePlay1 = new GamePlay(frame); // Tạo đối tượng GamePlay mới
 
-        frame.getContentPane().removeAll();  // Xóa nội dung cũ
-        frame.add(gamePlay1);  // Thêm gamePlay mới vào frame
-        frame.revalidate();  // Cập nhật lại layout
-        frame.repaint();  // Repaint màn hình
+        frame.getContentPane().removeAll(); // Xóa nội dung hiện tại
+        frame.add(gamePlay1); // Thêm màn hình game mới
+        frame.revalidate(); // Cập nhật layout
+        frame.repaint(); // Vẽ lại giao diện
 
-        gamePlay1.requestFocus();  // Đảm bảo GamePlay nhận sự kiện bàn phím
+        gamePlay1.requestFocus(); // Đảm bảo GamePlay nhận sự kiện bàn phím
     }
 
+    // Phương thức để quay về màn hình chính
     private void goHome() {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
 
-        // Xóa mọi thành phần của GameOver trước khi quay về màn hình chính
-        frame.getContentPane().removeAll();
+        frame.getContentPane().removeAll(); // Xóa nội dung hiện tại
+        StartScreen startScreen = new StartScreen(frame); // Tạo màn hình chính
+        frame.add(startScreen); // Thêm màn hình chính vào frame
 
-        // Thêm màn hình chính StartScreen
-        StartScreen startScreen = new StartScreen(frame);
-        frame.add(startScreen);
-
-        // Cập nhật và vẽ lại giao diện
-        frame.revalidate();
-        frame.repaint();
+        frame.revalidate(); // Cập nhật giao diện
+        frame.repaint(); // Vẽ lại giao diện
     }
 
-    // Phương thức tải hình ảnh
+    // Phương thức tải hình ảnh từ đường dẫn
     private Image loadImage(String path) {
-        ImageIcon icon = new ImageIcon(path);
-        return icon.getImage();
+        ImageIcon icon = new ImageIcon(path); // Tạo đối tượng ImageIcon từ đường dẫn
+        return icon.getImage(); // Lấy đối tượng Image từ ImageIcon
     }
 }

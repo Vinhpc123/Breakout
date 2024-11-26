@@ -51,49 +51,42 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
     public GamePlay(JFrame frame) {
         this.frame = frame;
-
-        // Tắt layout manager để sử dụng tọa độ thủ công
-        setLayout(null);
-
+    
+        setLayout(null); // Tắt layout manager
         initLevel(level); // Khởi tạo màn chơi đầu tiên
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
+    
         timer = new Timer(delay, this);
         timer.start();
-
-        // Tải hình nền và âm thanh
+    
         backgroundImage = loadImage("resources/images/BG_Lvl2.gif");
         playBackgroundMusic("resources/sounds/WinBGM.wav");
         loadBallHitSound("resources/sounds/Click.wav");
-
+    
+         // Tạo và cấu hình nút "Back"
         backButton = new JButton("Back");
-        backButton.setBounds(20, 510, 100, 30); // Kích thước và vị trí
-        backButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                goBackToStartScreen(); // Quay lại màn hình chính
-            }
-        });
+        backButton.setBounds(20, 510, 100, 30); // Vị trí và kích thước của nút
+        backButton.setFont(new Font("Arial", Font.BOLD, 14));
+        backButton.setBackground(Color.RED); // Màu nền đỏ
+        backButton.setForeground(Color.WHITE); // Màu chữ trắng
+        backButton.setBorderPainted(true);
+        backButton.setBorder(javax.swing.BorderFactory.createLineBorder(Color.YELLOW, 2));
         backButton.setFocusable(false);
 
-        // Tùy chỉnh giao diện nút
-        backButton.setOpaque(true); // Bắt buộc nút không trong suốt
-        setLayout(null); // Tắt layout manager
-
-        backButton.setBackground(new Color(255, 255, 255, 200)); // Màu đen với độ trong suốt
-        backButton.setForeground(Color.WHITE); // Màu chữ trắng
-        backButton.setFont(new Font("Arial", Font.BOLD, 14)); // Đặt font chữ
-        backButton.setBorderPainted(true); // Hiển thị viền
-        backButton.setBorder(javax.swing.BorderFactory.createLineBorder(Color.YELLOW, 2)); // Viền trắng dày 2px
-
-        // Thêm nút vào JPanel
+        // Lắng nghe sự kiện nhấn nút
+        backButton.addActionListener(e -> goBackToStartScreen(frame));
+        
+        // Thêm nút vào giao diện chỉ một lần trong constructor
         this.add(backButton);
-        // Đảm bảo gọi setComponentZOrder sau khi thêm backButton
-        this.setComponentZOrder(backButton, 0); // Đảm bảo nút nằm trên cùng
+        setComponentZOrder(backButton, 0); // Đảm bảo nút nằm trên cùng
     }
-
-    private void goBackToStartScreen() {
+            private Object goBackToStartScreen(JFrame frame2) {
+                // TODO Auto-generated method stub
+                throw new UnsupportedOperationException("Unimplemented method 'goBackToStartScreen'");
+            }
+            private void goBackToStartScreen() {
         stopMusic(); // Dừng nhạc nền nếu đang phát
         if (timer != null) {
             timer.stop();  // Dừng bộ hẹn giờ trước khi chuyển màn hình
@@ -123,17 +116,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             delay = 10;  // Tăng tốc độ nhanh nhất ở màn 3
         }
 
-        // // Tăng tốc độ bóng theo màn chơi
-        // if (level == 1) {
-        //     ballXDir = -1; // Tốc độ bóng ở màn 1
-        //     ballYDir = -1; // Tốc độ bóng ở màn 1
-        // } else if (level == 2) {
-        //     ballXDir = -2; // Tăng tốc độ bóng nhẹ ở màn 2
-        //     ballYDir = -2; // Tăng tốc độ bóng nhẹ ở màn 2
-        // } else {
-        //     ballXDir = -3; // Tăng tốc độ bóng nhanh ở màn 3
-        //     ballYDir = -3; // Tăng tốc độ bóng nhanh ở màn 3
-        // }
+        
         totalBricks = rows * cols;  // Tổng số gạch
         map = new MapGenerator(rows, cols);  // Khởi tạo bản đồ gạch
         timer = new Timer(delay, this);  // Tạo lại bộ hẹn giờ mới với tốc độ hiện tại
@@ -202,10 +185,12 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     @Override
     public void paint(Graphics g) {
         super.paint(g); // Đảm bảo vẽ lại các thành phần giao diện
+        // Đảm bảo nút Back luôn tồn tại trên giao diện
         if (!this.isAncestorOf(backButton)) {
-            this.add(backButton);
-        }
-
+        this.add(backButton);
+        setComponentZOrder(backButton, 0); // Đảm bảo nút nằm trên cùng
+        revalidate(); // Đảm bảo cập nhật giao diện đúng cách
+    }
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         }
