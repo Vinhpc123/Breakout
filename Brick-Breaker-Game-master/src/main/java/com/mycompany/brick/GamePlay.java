@@ -16,6 +16,7 @@ import java.io.File;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -44,11 +45,16 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     private Image backgroundImage;
     private Clip ballHitSound;
     private Clip backgroundMusic;
+    private JButton backButton; // Nút Back
 
     private boolean isMusicOn = true;
 
     public GamePlay(JFrame frame) {
         this.frame = frame;
+
+        // Tắt layout manager để sử dụng tọa độ thủ công
+        setLayout(null);
+
         initLevel(level); // Khởi tạo màn chơi đầu tiên
         addKeyListener(this);
         setFocusable(true);
@@ -60,10 +66,44 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         backgroundImage = loadImage("resources/images/BG_Lvl2.gif");
         playBackgroundMusic("resources/sounds/WinBGM.wav");
         loadBallHitSound("resources/sounds/Click.wav");
+
+        backButton = new JButton("Back");
+        backButton.setBounds(20, 510, 100, 30); // Kích thước và vị trí
+        backButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                goBackToStartScreen(); // Quay lại màn hình chính
+            }
+        });
+        backButton.setFocusable(false);
+
+        // Tùy chỉnh giao diện nút
+        backButton.setOpaque(true); // Bắt buộc nút không trong suốt
+        setLayout(null); // Tắt layout manager
+
+        backButton.setBackground(new Color(255, 255, 255, 200)); // Màu đen với độ trong suốt
+        backButton.setForeground(Color.WHITE); // Màu chữ trắng
+        backButton.setFont(new Font("Arial", Font.BOLD, 14)); // Đặt font chữ
+        backButton.setBorderPainted(true); // Hiển thị viền
+        backButton.setBorder(javax.swing.BorderFactory.createLineBorder(Color.YELLOW, 2)); // Viền trắng dày 2px
+
+        // Thêm nút vào JPanel
+        this.add(backButton);
+        // Đảm bảo gọi setComponentZOrder sau khi thêm backButton
+        this.setComponentZOrder(backButton, 0); // Đảm bảo nút nằm trên cùng
     }
 
-    public GamePlay(JFrame frame2, int score2) {
-        //TODO Auto-generated constructor stub
+    private void goBackToStartScreen() {
+        stopMusic(); // Dừng nhạc nền nếu đang phát
+        if (timer != null) {
+            timer.stop();  // Dừng bộ hẹn giờ trước khi chuyển màn hình
+        }
+        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        StartScreen startScreen = new StartScreen(frame); // Tạo đối tượng StartScreen
+        frame.getContentPane().removeAll(); // Xóa nội dung hiện tại
+        frame.add(startScreen); // Thêm StartScreen vào frame
+        frame.revalidate(); // Cập nhật lại layout
+        frame.repaint(); // Vẽ lại frame
     }
 
     public GamePlay(JFrame frame2, int nextLevel, int score2) {
@@ -72,32 +112,28 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
     private void initLevel(int level) {
         int rows = level + 2; // Số hàng gạch tăng theo level
-        int cols = 1;         // Số cột gạch cố định
+        int cols = 3;         // Số cột gạch cố định
 
-        // Điều chỉnh độ trễ dựa trên level
+        // Điều chỉnh độ trễ (delay) dựa trên level
         if (level == 1) {
             delay = 15; // Tốc độ chậm nhất ở màn 1
         } else if (level == 2) {
-            delay = 15;  // Tăng nhẹ tốc độ ở màn 2
+            delay = 12;  // Tăng nhẹ tốc độ ở màn 2
         } else {
-            delay = 15; // Tăng tốc độ nhanh nhất ở màn 3
+            delay = 10;  // Tăng tốc độ nhanh nhất ở màn 3
         }
 
-        totalBricks = rows * cols;  // Tổng số gạch
-        map = new MapGenerator(rows, cols);  // Khởi tạo bản đồ gạch
-
-        // Tăng tốc độ bóng theo màn chơi
-        if (level == 1) {
-            ballXDir = -1; // Tốc độ chậm nhất ở màn 1
-            ballYDir = -1;
-        } else if (level == 2) {
-            ballXDir = -1; // Tăng nhẹ tốc độ ở màn 2
-            ballYDir = -2;
-        } else {
-            ballXDir = -2; // Tăng tốc độ nhiều hơn ở màn 3
-            ballYDir = -3;
-        }
-
+        // // Tăng tốc độ bóng theo màn chơi
+        // if (level == 1) {
+        //     ballXDir = -1; // Tốc độ bóng ở màn 1
+        //     ballYDir = -1; // Tốc độ bóng ở màn 1
+        // } else if (level == 2) {
+        //     ballXDir = -2; // Tăng tốc độ bóng nhẹ ở màn 2
+        //     ballYDir = -2; // Tăng tốc độ bóng nhẹ ở màn 2
+        // } else {
+        //     ballXDir = -3; // Tăng tốc độ bóng nhanh ở màn 3
+        //     ballYDir = -3; // Tăng tốc độ bóng nhanh ở màn 3
+        // }
         totalBricks = rows * cols;  // Tổng số gạch
         map = new MapGenerator(rows, cols);  // Khởi tạo bản đồ gạch
         timer = new Timer(delay, this);  // Tạo lại bộ hẹn giờ mới với tốc độ hiện tại
@@ -165,7 +201,10 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
     @Override
     public void paint(Graphics g) {
-        super.paint(g);
+        super.paint(g); // Đảm bảo vẽ lại các thành phần giao diện
+        if (!this.isAncestorOf(backButton)) {
+            this.add(backButton);
+        }
 
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
@@ -225,6 +264,10 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     }
 
     private void showWinScreen() {
+        stopMusic(); // Dừng nhạc nền nếu đang phát
+        if (timer != null) {
+            timer.stop();  // Dừng bộ hẹn giờ trước khi chuyển màn hình
+        }
         // Hiển thị màn hình "You Win" khi người chơi hoàn thành màn chơi
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
         YouWin youWinScreen = new YouWin(frame, score, ballPosX); // Chuyển điểm số đến màn hình "You Win"
@@ -235,6 +278,10 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     }
 
     private void showGameOverScreen() {
+        stopMusic(); // Dừng nhạc nền nếu đang phát
+        if (timer != null) {
+            timer.stop();  // Dừng bộ hẹn giờ trước khi chuyển màn hình
+        }
         // Chuyển màn hình sang GameOver
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
         GameOver gameOverScreen = new GameOver(frame, score, 0); // Truyền điểm số hiện tại vào GameOver
@@ -310,7 +357,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         level = 1;  // Quay lại màn đầu tiên
         score = 0;  // Reset điểm số
         totalBricks = 21;  // Đặt lại tổng số gạch
-        map = new MapGenerator(3, 7);  // Tạo lại bản đồ gạch
+        map = new MapGenerator(3, 3);  // Tạo lại bản đồ gạch
         ballPosX = 120;  // Vị trí ban đầu của bóng
         ballPosY = 350;
         ballXDir = -1;  // Hướng ban đầu của bóng
@@ -320,11 +367,19 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         // Đặt lại trạng thái chơi và bộ đếm thời gian
         play = true;
         paused = false;  // Không tạm dừng
-        initLevel(level);  // Khởi tạo màn chơi
+
+        // Khởi tạo lại bộ hẹn giờ (timer) và tốc độ trò chơi
+        if (timer != null) {
+            timer.stop();  // Dừng bộ hẹn giờ cũ trước khi tạo mới
+        }
+
+        initLevel(level);  // Khởi tạo lại màn chơi mới
 
         requestFocus(); // Đảm bảo JPanel nhận input từ bàn phím
 
-        repaint();  // Làm mới giao diện
+        // Đảm bảo rằng bộ hẹn giờ được khởi động lại với tốc độ mới
+        timer = new Timer(delay, this);  // Tạo lại bộ hẹn giờ với độ trễ mới
+        timer.start();  // Bắt đầu bộ hẹn giờ mới
     }
 
     @Override
@@ -339,21 +394,8 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         }
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
             if (!play) {
-                if (ballPosY > 570) {
-                    // Reset game
-                    level = 1;  // Đặt lại level về màn đầu
-                    score = 0;  // Reset điểm số
-                    totalBricks = 21;  // Đặt lại tổng số gạch ban đầu
-                    map = new MapGenerator(3, 7);  // Khởi tạo bản đồ gạch ban đầu
-                    ballPosX = 120;  // Vị trí ban đầu của bóng
-                    ballPosY = 350;
-                    ballXDir = -1;  // Đặt lại tốc độ của bóng
-                    ballYDir = -2;  // Đặt lại tốc độ của bóng
-                    playerX = 310;  // Vị trí ban đầu của người chơi
 
-                    // Khởi tạo lại mức độ và các tham số liên quan đến game
-                    initLevel(level);
-                } else if (totalBricks == 0) {
+                if (totalBricks == 0) {
                     // Next level
                     if (level < 3) {
                         level++;

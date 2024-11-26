@@ -110,22 +110,27 @@ public class YouWin extends JPanel {
     // Tiến đến màn chơi tiếp theo
     private void restartGame() {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        GamePlay gamePlay = new GamePlay(frame);  // Tạo đối tượng GamePlay mới
+        GamePlay gamePlay2 = new GamePlay(frame);  // Tạo đối tượng GamePlay mới
 
         frame.getContentPane().removeAll();  // Xóa nội dung cũ
-        frame.add(gamePlay);  // Thêm gamePlay mới vào frame
+        frame.add(gamePlay2);  // Thêm gamePlay mới vào frame
         frame.revalidate();  // Cập nhật lại layout
         frame.repaint();  // Repaint màn hình
 
-        gamePlay.requestFocus();  // Đảm bảo GamePlay nhận sự kiện bàn phím
+        gamePlay2.requestFocus();  // Đảm bảo GamePlay nhận sự kiện bàn phím
     }
 
-    // Quay lại màn hình chính
     private void goHome() {
         JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        StartScreen startScreen = new StartScreen(frame);
+
+        // Xóa mọi thành phần của GameOver trước khi quay về màn hình chính
         frame.getContentPane().removeAll();
+
+        // Thêm màn hình chính StartScreen
+        StartScreen startScreen = new StartScreen(frame);
         frame.add(startScreen);
+
+        // Cập nhật và vẽ lại giao diện
         frame.revalidate();
         frame.repaint();
     }

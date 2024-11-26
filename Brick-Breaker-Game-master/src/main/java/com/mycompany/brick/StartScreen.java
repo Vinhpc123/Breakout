@@ -111,7 +111,7 @@ public class StartScreen extends JPanel {
         button.setPreferredSize(new Dimension(170, 55));
         button.addActionListener(e -> {
             JOptionPane.showMessageDialog(frame,
-                    "Use the Left and Right arrow keys to move the paddle.\nBreak all the bricks to win!",
+                    "Sử dụng các phím mũi tên Trái và Phải để di chuyển thanh ngang.\n Phá vỡ tất cả các viên gạch để giành chiến thắng!.\n Nhấn phím p nếu muốn bạn muốn tạm dừng trò chơi ! .\n Nhấn phím m nếu bạn muốn tắt nhạc nền lúc chơi !",
                     "Instructions", JOptionPane.INFORMATION_MESSAGE);
         });
         return button;
