@@ -30,4 +30,3 @@ Project: Game Brick Breaker
   Tính Năng Multiplayer: Cho phép hai người chơi cạnh tranh với nhau trên cùng một màn hình.<br>
 
 ------------------------------------------------------------------------------------------------------------------------------------------
-Sample: Github Repository Link
