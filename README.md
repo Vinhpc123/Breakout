@@ -24,9 +24,9 @@ Project: Game Brick Breaker
   Compile and Run the Game<br>
   Enjoy Breaking the Bricks!<br>
 
-- Future Enhancements:
-  Cấp Độ Khó Khác Nhau: Thêm nhiều cấp độ khó với các kiểu gạch và bố cục khác nhau.
-  Hiệu Ứng Đồ Họa: Tăng cường hiệu ứng hình ảnh khi bóng va vào gạch.
-  Tính Năng Multiplayer: Cho phép hai người chơi cạnh tranh với nhau trên cùng một màn hình.
+- Future Enhancements:<br>
+  Cấp Độ Khó Khác Nhau: Thêm nhiều cấp độ khó với các kiểu gạch và bố cục khác nhau.<br>
+  Hiệu Ứng Đồ Họa: Tăng cường hiệu ứng hình ảnh khi bóng va vào gạch.<br>
+  Tính Năng Multiplayer: Cho phép hai người chơi cạnh tranh với nhau trên cùng một màn hình.<br>
 
 Sample: Github Repository Link
