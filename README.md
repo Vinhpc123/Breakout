@@ -14,17 +14,17 @@ Project: Game Brick Breaker
     -Giao Diện Đồ Họa: Sử dụng thư viện Java Swing để hiển thị trò chơi với đồ họa mượt mà.<br>
 
 
-- Technologies Used:<br>
+- **Technologies Used:** <br>
   Ngôn ngữ: Java<br>
   Giao Diện: Java Swing<br>
 
 
-- Getting Started:<br>
+- **Getting Started:** <br>
   Set Up the Environment<br>
   Compile and Run the Game<br>
   Enjoy Breaking the Bricks!<br>
 
-- Future Enhancements:<br>
+- **Future Enhancements:** <br>
   Cấp Độ Khó Khác Nhau: Thêm nhiều cấp độ khó với các kiểu gạch và bố cục khác nhau.<br>
   Hiệu Ứng Đồ Họa: Tăng cường hiệu ứng hình ảnh khi bóng va vào gạch.<br>
   Tính Năng Multiplayer: Cho phép hai người chơi cạnh tranh với nhau trên cùng một màn hình.<br>
