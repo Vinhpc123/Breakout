@@ -1,5 +1,5 @@
 Project: Game Brick Breaker
-
+------------------------------------------------------------------------------------------------------------------------
 
 Description: 
 Breakout là một trò chơi Java cổ điển, nơi người chơi sử dụng thanh trượt để đẩy bóng và phá vỡ các khối gạch trên màn hình. 
