@@ -4,7 +4,8 @@ Project: Game Brick Breaker
 - **Description:** <br>
   Breakout là một trò chơi Java cổ điển, nơi người chơi sử dụng thanh trượt để đẩy bóng và phá vỡ các khối gạch trên màn hình. Trò chơi này giúp người chơi cải thiện kỹ năng phối hợp tay mắt và phản xạ.
 
-![Uploading image.png…]()
+![image](https://github.com/user-attachments/assets/efbd7717-be74-4561-905b-74fe1632bc85)
+
 
   Key Features:<br>
     -Điều Khiển Thanh Trượt: Sử dụng bàn phím để di chuyển thanh trượt sang trái và phải.<br>
