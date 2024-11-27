@@ -23,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
+import com.mycompany.brick.GamePlay; 
 
 public class StartScreen extends JPanel {
 
@@ -71,9 +72,14 @@ public class StartScreen extends JPanel {
         gbc.gridy = 2;
         add(instructionsButton, gbc);
 
+        // Nút "Rank" để xem bảng xếp hạng
+        JButton rankButton = createStyledRankButton("Rank", frame);
+        gbc.gridy = 3;
+        add(rankButton, gbc);
+
         // Nút "Exit Game" để thoát game
         JButton exitButton = createStyledExitButton("Exit Game");
-        gbc.gridy = 3;
+        gbc.gridy = 4;
         add(exitButton, gbc);
 
         // Thêm sự kiện lắng nghe click chuột
@@ -86,6 +92,21 @@ public class StartScreen extends JPanel {
                 }
             }
         });
+    }
+
+    // Hàm tạo nút "Rank"
+    private JButton createStyledRankButton(String text, JFrame frame) {
+        JButton button = new JButton(text);
+        styleButton(button); // Áp dụng phong cách cho nút
+        button.setPreferredSize(new Dimension(170, 55)); // Đặt kích thước cho nút
+        button.addActionListener(e -> {
+            // Chuyển sang màn hình bảng xếp hạng
+            frame.getContentPane().removeAll();
+            frame.add(new HighScoreScreen(frame)); // Thêm màn hình bảng xếp hạng
+            frame.revalidate(); // Cập nhật lại giao diện
+            frame.repaint(); // Vẽ lại giao diện
+        });
+        return button;
     }
 
     // Hàm tạo nút "Start Game"

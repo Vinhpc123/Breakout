@@ -11,7 +11,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -21,6 +29,8 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
+
+
 
 public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
@@ -48,24 +58,26 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     private JButton backButton; // Nút Back
 
     private boolean isMusicOn = true;
+    private static final String SCORE_FILE = "highscores.txt";
+
 
     public GamePlay(JFrame frame) {
         this.frame = frame;
-    
+
         setLayout(null); // Tắt layout manager
         initLevel(level); // Khởi tạo màn chơi đầu tiên
         addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
-    
+
         timer = new Timer(delay, this);
         timer.start();
-    
+
         backgroundImage = loadImage("resources/images/BG_Lvl2.gif");
         playBackgroundMusic("resources/sounds/WinBGM.wav");
         loadBallHitSound("resources/sounds/Click.wav");
-    
-         // Tạo và cấu hình nút "Back"
+
+        // Tạo và cấu hình nút "Back"
         backButton = new JButton("Back");
         backButton.setBounds(20, 510, 100, 30); // Vị trí và kích thước của nút
         backButton.setFont(new Font("Arial", Font.BOLD, 14));
@@ -77,16 +89,18 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
         // Lắng nghe sự kiện nhấn nút
         backButton.addActionListener(e -> goBackToStartScreen(frame));
-        
+
         // Thêm nút vào giao diện chỉ một lần trong constructor
         this.add(backButton);
         setComponentZOrder(backButton, 0); // Đảm bảo nút nằm trên cùng
     }
-            private Object goBackToStartScreen(JFrame frame2) {
-                // TODO Auto-generated method stub
-                throw new UnsupportedOperationException("Unimplemented method 'goBackToStartScreen'");
-            }
-            private void goBackToStartScreen() {
+
+    private Object goBackToStartScreen(JFrame frame2) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'goBackToStartScreen'");
+    }
+
+    private void goBackToStartScreen() {
         stopMusic(); // Dừng nhạc nền nếu đang phát
         if (timer != null) {
             timer.stop();  // Dừng bộ hẹn giờ trước khi chuyển màn hình
@@ -97,6 +111,42 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         frame.add(startScreen); // Thêm StartScreen vào frame
         frame.revalidate(); // Cập nhật lại layout
         frame.repaint(); // Vẽ lại frame
+    }
+      private void ensureScoreFileExists() {
+        File file = new File(SCORE_FILE);
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                System.err.println("Error creating score file: " + e.getMessage());
+            }
+        }
+    }
+
+    private void saveScore(int score) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(SCORE_FILE, true))) {
+            writer.write(String.valueOf(score));
+            writer.newLine();
+        } catch (IOException e) {
+            System.err.println("Error saving score: " + e.getMessage());
+        }
+    }
+
+    private List<Integer> getTopScores(int topN) {
+        List<Integer> scores = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(SCORE_FILE))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                try {
+                    scores.add(Integer.parseInt(line));
+                } catch (NumberFormatException ignored) {
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading scores: " + e.getMessage());
+        }
+        scores.sort(Collections.reverseOrder());
+        return scores.size() > topN ? scores.subList(0, topN) : scores;
     }
 
     public GamePlay(JFrame frame2, int nextLevel, int score2) {
@@ -116,7 +166,6 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             delay = 10;  // Tăng tốc độ nhanh nhất ở màn 3
         }
 
-        
         totalBricks = rows * cols;  // Tổng số gạch
         map = new MapGenerator(rows, cols);  // Khởi tạo bản đồ gạch
         timer = new Timer(delay, this);  // Tạo lại bộ hẹn giờ mới với tốc độ hiện tại
@@ -187,10 +236,10 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         super.paint(g); // Đảm bảo vẽ lại các thành phần giao diện
         // Đảm bảo nút Back luôn tồn tại trên giao diện
         if (!this.isAncestorOf(backButton)) {
-        this.add(backButton);
-        setComponentZOrder(backButton, 0); // Đảm bảo nút nằm trên cùng
-        revalidate(); // Đảm bảo cập nhật giao diện đúng cách
-    }
+            this.add(backButton);
+            setComponentZOrder(backButton, 0); // Đảm bảo nút nằm trên cùng
+            revalidate(); // Đảm bảo cập nhật giao diện đúng cách
+        }
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         }
@@ -249,6 +298,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     }
 
     private void showWinScreen() {
+        saveScore(score);
         stopMusic(); // Dừng nhạc nền nếu đang phát
         if (timer != null) {
             timer.stop();  // Dừng bộ hẹn giờ trước khi chuyển màn hình
@@ -263,6 +313,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     }
 
     private void showGameOverScreen() {
+        saveScore(score);
         stopMusic(); // Dừng nhạc nền nếu đang phát
         if (timer != null) {
             timer.stop();  // Dừng bộ hẹn giờ trước khi chuyển màn hình
