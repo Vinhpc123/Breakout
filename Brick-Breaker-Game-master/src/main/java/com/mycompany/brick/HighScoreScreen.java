@@ -1,9 +1,11 @@
 package com.mycompany.brick;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import javax.swing.JButton;
@@ -18,12 +20,15 @@ public class HighScoreScreen extends JPanel {
 
     private static final String SCORE_FILE = "highscores.txt"; // Tên tệp chứa điểm số
 
+    // Đếm số lần chơi (có thể thay đổi dựa trên cách quản lý trò chơi của bạn)
+    private static int playCount = 0;
+
     public HighScoreScreen(JFrame frame) {
         setLayout(new BorderLayout());
         setBackground(new Color(20, 20, 40)); // Đặt màu nền
-        
+
         // Tiêu đề bảng xếp hạng
-        JLabel titleLabel = new JLabel("High Scores", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Lịch Sử Trò Chơi", SwingConstants.CENTER);
         titleLabel.setFont(new Font("Monospaced", Font.BOLD, 48));
         titleLabel.setForeground(new Color(250, 247, 240));
         add(titleLabel, BorderLayout.NORTH);
@@ -43,7 +48,7 @@ public class HighScoreScreen extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
 
         // Nút quay lại menu chính
-        JButton backButton = new JButton("Back to Menu");
+        JButton backButton = new JButton("Trang Chủ");
         backButton.setFont(new Font("Serif", Font.BOLD, 24));
         backButton.setBackground(new Color(154, 126, 111));
         backButton.setForeground(Color.WHITE);
@@ -74,6 +79,16 @@ public class HighScoreScreen extends JPanel {
         } catch (IOException e) {
             e.printStackTrace();
             return new String[]{"No scores available."}; // Trả về thông báo lỗi nếu không thể đọc tệp
+        }
+    }
+
+   
+    public void saveScore(int score) {
+        try (FileWriter writer = new FileWriter(SCORE_FILE, true)) {
+           
+           
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

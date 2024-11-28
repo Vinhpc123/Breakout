@@ -28,9 +28,9 @@ public class GameOver extends JPanel {
         gameOverImage = loadImage("resources/images/GameOverBackground.gif");
 
         // Khởi tạo các nút
-        restartButton = createButton("Play Again", 250, 350, 200, 50); // Nút chơi lại
-        homeButton = createButton("Home", 250, 425, 200, 50); // Nút về màn hình chính
-        exitButton = createButton("Exit", 250, 500, 200, 50); // Nút thoát game
+        restartButton = createButton("Chơi Lại", 250, 350, 200, 50); // Nút chơi lại
+        homeButton = createButton("Trang Chủ", 250, 425, 200, 50); // Nút về màn hình chính
+        exitButton = createButton("Thoát", 250, 500, 200, 50); // Nút thoát game
 
         // Thêm các nút vào panel
         add(restartButton);
@@ -58,7 +58,7 @@ public class GameOver extends JPanel {
         }
 
         // Tạo chuỗi hiển thị điểm số
-        String scoreText = "Score: " + score;
+        String scoreText = "Điểm: " + score;
 
         // Sử dụng Graphics2D để vẽ chữ với hiệu ứng
         Graphics2D g2d = (Graphics2D) g;
@@ -127,11 +127,11 @@ public class GameOver extends JPanel {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (text.equals("Play Again")) { // Nếu bấm nút "Play Again"
+                if (text.equals("Chơi Lại")) { // Nếu bấm nút "Play Again"
                     restartGame();
-                } else if (text.equals("Home")) { // Nếu bấm nút "Home"
+                } else if (text.equals("Trang Chủ")) { // Nếu bấm nút "Home"
                     goHome();
-                } else if (text.equals("Exit")) { // Nếu bấm nút "Exit"
+                } else if (text.equals("Thoát")) { // Nếu bấm nút "Exit"
                     System.exit(0); // Thoát chương trình
                 }
             }

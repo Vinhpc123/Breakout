@@ -23,7 +23,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
-import com.mycompany.brick.GamePlay; 
 
 public class StartScreen extends JPanel {
 
@@ -63,22 +62,22 @@ public class StartScreen extends JPanel {
         add(title, gbc);
 
         // Nút "Start Game" để bắt đầu trò chơi
-        JButton startButton = createStyledButton("Start Game", frame);
+        JButton startButton = createStyledButton("Bắt Đầu", frame);
         gbc.gridy = 1;
         add(startButton, gbc);
 
         // Nút "Instructions" để xem hướng dẫn
-        JButton instructionsButton = createStyledInstructionsButton("Instructions", frame);
+        JButton instructionsButton = createStyledInstructionsButton("Giới Thiệu", frame);
         gbc.gridy = 2;
         add(instructionsButton, gbc);
 
         // Nút "Rank" để xem bảng xếp hạng
-        JButton rankButton = createStyledRankButton("Rank", frame);
+        JButton rankButton = createStyledRankButton("Lịch Sử", frame);
         gbc.gridy = 3;
         add(rankButton, gbc);
 
         // Nút "Exit Game" để thoát game
-        JButton exitButton = createStyledExitButton("Exit Game");
+        JButton exitButton = createStyledExitButton("Thoát");
         gbc.gridy = 4;
         add(exitButton, gbc);
 
@@ -138,7 +137,7 @@ public class StartScreen extends JPanel {
                             + "Phá vỡ tất cả các viên gạch để giành chiến thắng!\n"
                             + "Nhấn phím P nếu muốn tạm dừng trò chơi!\n"
                             + "Nhấn phím M nếu bạn muốn tắt nhạc nền lúc chơi!",
-                    "Instructions", JOptionPane.INFORMATION_MESSAGE);
+                    "Giới Thiệu", JOptionPane.INFORMATION_MESSAGE);
         });
         return button;
     }

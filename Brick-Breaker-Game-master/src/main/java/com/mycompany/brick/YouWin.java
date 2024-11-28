@@ -26,9 +26,9 @@ public class YouWin extends JPanel {
         youWinImage = loadImage("resources/images/WinBackground.png");
 
         // Khởi tạo các nút
-        restartButton = createButton("Play Again", 250, 350, 200, 50);
-        homeButton = createButton("Home", 250, 425, 200, 50);
-        exitButton = createButton("Exit", 250, 500, 200, 50);
+        restartButton = createButton("Chơi Lại", 250, 350, 200, 50);
+        homeButton = createButton("Trang Chủ", 250, 425, 200, 50);
+        exitButton = createButton("Thoát", 250, 500, 200, 50);
 
         // Thêm các nút vào panel
         add(restartButton);
@@ -66,7 +66,7 @@ public class YouWin extends JPanel {
         Font scoreFont = new Font("Arial", Font.BOLD, 50);
         g2d.setFont(scoreFont);
 
-        // Tính toán vị trí Y của Score sao cho nằm giữa "Game Over" và "Play Again"
+        // Tính toán vị trí Y của Score sao cho nằm giữa "Game w" và "Play Again"
         int imageBottomY = getHeight() / 14 + 200; // Dưới cùng của hình ảnh Game Over
         int buttonTopY = 380; // Vị trí của nút "Play Again"
         int scoreY = (imageBottomY + buttonTopY) / 2; // Trung bình giữa hình ảnh và nút Play Again
@@ -95,11 +95,11 @@ public class YouWin extends JPanel {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (text.equals("Play Again")) {
+                if (text.equals("Chơi Lại")) {
                     restartGame(); // Tiến đến màn chơi tiếp theo
-                } else if (text.equals("Home")) {
+                } else if (text.equals("Trang Chủ")) {
                     goHome();
-                } else if (text.equals("Exit")) {
+                } else if (text.equals("Thoát")) {
                     System.exit(0);
                 }
             }

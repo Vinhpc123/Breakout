@@ -11,15 +11,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -29,8 +24,6 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-
-
 
 public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
@@ -60,7 +53,6 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     private boolean isMusicOn = true;
     private static final String SCORE_FILE = "highscores.txt";
 
-
     public GamePlay(JFrame frame) {
         this.frame = frame;
 
@@ -77,7 +69,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         playBackgroundMusic("resources/sounds/WinBGM.wav");
         loadBallHitSound("resources/sounds/Click.wav");
 
-        // Tạo và cấu hình nút "Back"
+        // Khởi tạo và thêm nút Back
         backButton = new JButton("Back");
         backButton.setBounds(20, 510, 100, 30); // Vị trí và kích thước của nút
         backButton.setFont(new Font("Arial", Font.BOLD, 14));
@@ -88,16 +80,12 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         backButton.setFocusable(false);
 
         // Lắng nghe sự kiện nhấn nút
-        backButton.addActionListener(e -> goBackToStartScreen(frame));
+        backButton.addActionListener(e -> goBackToStartScreen());
 
         // Thêm nút vào giao diện chỉ một lần trong constructor
         this.add(backButton);
         setComponentZOrder(backButton, 0); // Đảm bảo nút nằm trên cùng
-    }
 
-    private Object goBackToStartScreen(JFrame frame2) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'goBackToStartScreen'");
     }
 
     private void goBackToStartScreen() {
@@ -105,49 +93,64 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         if (timer != null) {
             timer.stop();  // Dừng bộ hẹn giờ trước khi chuyển màn hình
         }
-        JFrame frame = (JFrame) SwingUtilities.getWindowAncestor(this);
-        StartScreen startScreen = new StartScreen(frame); // Tạo đối tượng StartScreen
-        frame.getContentPane().removeAll(); // Xóa nội dung hiện tại
-        frame.add(startScreen); // Thêm StartScreen vào frame
-        frame.revalidate(); // Cập nhật lại layout
-        frame.repaint(); // Vẽ lại frame
+
+        // Lấy JFrame hiện tại và chuyển sang StartScreen
+        JFrame currentFrame = (JFrame) SwingUtilities.getWindowAncestor(this);
+        StartScreen startScreen = new StartScreen(currentFrame); // Tạo đối tượng StartScreen
+        currentFrame.getContentPane().removeAll(); // Xóa nội dung hiện tại
+        currentFrame.add(startScreen); // Thêm StartScreen vào frame
+        currentFrame.revalidate(); // Cập nhật lại layout
+        currentFrame.repaint(); // Vẽ lại frame
     }
-      private void ensureScoreFileExists() {
-        File file = new File(SCORE_FILE);
-        if (!file.exists()) {
+
+    // Phương thức đảm bảo rằng tệp tin lưu điểm số tồn tại
+    private void ensureScoreFileExists() {
+        File file = new File(SCORE_FILE); // Tạo một đối tượng File tham chiếu tới tệp tin `SCORE_FILE`
+
+        if (!file.exists()) { // Kiểm tra xem tệp tin có tồn tại hay không
             try {
-                file.createNewFile();
-            } catch (IOException e) {
+                file.createNewFile(); // Nếu tệp tin chưa tồn tại, tạo mới tệp tin
+            } catch (IOException e) { // Bắt lỗi nếu có vấn đề xảy ra khi tạo tệp
                 System.err.println("Error creating score file: " + e.getMessage());
+                // In thông báo lỗi ra console (dùng `System.err` để báo lỗi)
             }
         }
     }
 
+// Phương thức lưu điểm số vào tệp tin
     private void saveScore(int score) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(SCORE_FILE, true))) {
-            writer.write(String.valueOf(score));
-            writer.newLine();
-        } catch (IOException e) {
+            // Mở tệp tin để ghi thêm dữ liệu vào cuối tệp mà không ghi đè (flag `true`)
+            writer.write(String.valueOf(score)); // Chuyển điểm số từ int sang chuỗi và ghi vào tệp
+            writer.newLine(); // Thêm một dòng mới sau mỗi điểm số
+        } catch (IOException e) { // Bắt lỗi nếu có vấn đề khi ghi vào tệp tin
             System.err.println("Error saving score: " + e.getMessage());
+            // In thông báo lỗi ra console
         }
     }
 
-    private List<Integer> getTopScores(int topN) {
-        List<Integer> scores = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(SCORE_FILE))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                try {
-                    scores.add(Integer.parseInt(line));
-                } catch (NumberFormatException ignored) {
-                }
-            }
-        } catch (IOException e) {
-            System.err.println("Error reading scores: " + e.getMessage());
-        }
-        scores.sort(Collections.reverseOrder());
-        return scores.size() > topN ? scores.subList(0, topN) : scores;
-    }
+// // Phương thức lấy danh sách các điểm số cao nhất (top N)
+//     private List<Integer> getTopScores(int topN) {
+//         List<Integer> scores = new ArrayList<>(); // Tạo một danh sách để lưu trữ điểm số
+
+//         try (BufferedReader reader = new BufferedReader(new FileReader(SCORE_FILE))) {
+//             // Mở tệp tin để đọc dữ liệu
+//             String line;
+//             while ((line = reader.readLine()) != null) {
+//                 // Đọc từng dòng trong tệp cho đến khi không còn dòng nào
+//                 try {
+//                     scores.add(Integer.parseInt(line));
+//                     // Chuyển mỗi dòng (chuỗi) thành số nguyên và thêm vào danh sách
+//                 } catch (NumberFormatException ignored) {
+//                     // Bỏ qua dòng nào không phải là số nguyên hợp lệ
+//                 }
+//             }
+//         } catch (IOException e) { // Bắt lỗi nếu có vấn đề xảy ra khi đọc tệp tin
+//             System.err.println("Error reading scores: " + e.getMessage());
+//             // In thông báo lỗi ra console
+//         }
+//                 return scores;
+//     }
 
     public GamePlay(JFrame frame2, int nextLevel, int score2) {
         //TODO Auto-generated constructor stub
@@ -170,6 +173,18 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         map = new MapGenerator(rows, cols);  // Khởi tạo bản đồ gạch
         timer = new Timer(delay, this);  // Tạo lại bộ hẹn giờ mới với tốc độ hiện tại
         timer.start();  // Bắt đầu bộ hẹn giờ
+
+        // Xác định vị trí thanh ngang (bar)
+        int barX = 150;    // Vị trí X của thanh ngang
+        int barY = 400;    // Vị trí Y của thanh ngang
+        int barWidth = 100;  // Chiều rộng của thanh ngang
+        int barHeight = 20;  // Chiều cao của thanh ngang
+
+        // Xác định vị trí của bóng
+        int ballRadius = 10;  // Bán kính bóng
+        int ballX = barX + barWidth / 2;  // Đặt bóng tại trung tâm thanh ngang (theo chiều rộng)
+        int ballY = barY - ballRadius;   // Đặt bóng ngay phía trên thanh ngang (theo chiều cao)
+
     }
 
     private void playBackgroundMusic(String musicPath) {
@@ -234,12 +249,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
     @Override
     public void paint(Graphics g) {
         super.paint(g); // Đảm bảo vẽ lại các thành phần giao diện
-        // Đảm bảo nút Back luôn tồn tại trên giao diện
-        if (!this.isAncestorOf(backButton)) {
-            this.add(backButton);
-            setComponentZOrder(backButton, 0); // Đảm bảo nút nằm trên cùng
-            revalidate(); // Đảm bảo cập nhật giao diện đúng cách
-        }
+
         if (backgroundImage != null) {
             g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
         }
@@ -253,8 +263,8 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
 
         g.setColor(new Color(255, 215, 0));
         g.setFont(new Font("Arial", Font.BOLD, 20));
-        g.drawString("Score: " + score, 540, 30);
-        g.drawString("Level: " + level, 20, 30);
+        g.drawString("Điểm: " + score, 540, 30);
+        g.drawString("Màn: " + level, 20, 30);
 
         g.setColor(new Color(70, 130, 180));
         g.fillRect(playerX, 550, 100, 8);
@@ -281,7 +291,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
                 play = false;
                 g.setColor(new Color(0, 255, 0));
                 g.setFont(new Font("Serif", Font.BOLD, 40));
-                g.drawString(" Level " + level + " Hoàn Thành!", 180, 300);
+                g.drawString(" Màn " + level + " Hoàn Thành!", 180, 300);
                 g.setFont(new Font("Arial", Font.BOLD, 20
                 ));
                 g.drawString("Nhấn Phím Enter Để Chơi Màn Tiếp Theo!", 175, 350);
@@ -291,7 +301,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         if (paused) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Serif", Font.BOLD, 50));
-            g.drawString("PAUSED", 260, 300);
+            g.drawString("Dừng", 260, 300);
         }
 
         g.dispose();
@@ -392,7 +402,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         // Reset toàn bộ trạng thái trò chơi
         level = 1;  // Quay lại màn đầu tiên
         score = 0;  // Reset điểm số
-        totalBricks = 21;  // Đặt lại tổng số gạch
+        totalBricks = 9;  // Đặt lại tổng số gạch
         map = new MapGenerator(3, 3);  // Tạo lại bản đồ gạch
         ballPosX = 120;  // Vị trí ban đầu của bóng
         ballPosY = 350;
