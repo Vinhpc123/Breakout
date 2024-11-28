@@ -220,31 +220,50 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
             e.printStackTrace();
         }
     }
+// Phương thức tải hình ảnh từ đường dẫn chỉ định
+private Image loadImage(String path) {
+    Image img = Toolkit.getDefaultToolkit().getImage(path); 
+    // Sử dụng Toolkit để tải hình ảnh từ đường dẫn
 
-    private Image loadImage(String path) {
-        Image img = Toolkit.getDefaultToolkit().getImage(path);
-        if (img == null) {
-            System.err.println("Image not found: " + path);
-        }
-        return img;
+    if (img == null) { 
+        // Kiểm tra nếu không thể tải được hình ảnh (img == null)
+        System.err.println("Image not found: " + path); 
+        // In thông báo lỗi và đường dẫn của hình ảnh không tìm thấy
     }
 
-    private void stopMusic() {
-        if (backgroundMusic != null && backgroundMusic.isRunning()) {
-            backgroundMusic.stop();
-        }
+    return img; 
+    // Trả về hình ảnh đã tải hoặc null nếu không tải được
+}
+
+// Phương thức dừng phát nhạc nền
+private void stopMusic() {
+    if (backgroundMusic != null && backgroundMusic.isRunning()) { 
+        // Kiểm tra nếu đối tượng phát nhạc (`backgroundMusic`) không rỗng 
+        // và nhạc đang chạy (`isRunning` trả về true)
+        backgroundMusic.stop(); 
+        // Dừng phát nhạc nền
+    }
+}
+
+// Phương thức bật/tắt nhạc nền
+private void toggleMusic() {
+    if (isMusicOn) { 
+        // Nếu nhạc nền đang bật (biến `isMusicOn` là true)
+        stopMusic(); 
+        // Gọi phương thức `stopMusic` để dừng phát nhạc
+        isMusicOn = false; 
+        // Đặt trạng thái nhạc nền thành tắt (false)
+    } else { 
+        // Nếu nhạc nền đang tắt (biến `isMusicOn` là false)
+        playBackgroundMusic("resources/sounds/WinBGM.wav"); 
+        // Gọi phương thức `playBackgroundMusic` để phát file nhạc mới từ đường dẫn
+        isMusicOn = true; 
+        // Đặt trạng thái nhạc nền thành bật (true)
     }
 
-    private void toggleMusic() {
-        if (isMusicOn) {
-            stopMusic();
-            isMusicOn = false;
-        } else {
-            playBackgroundMusic("resources/sounds/WinBGM.wav");
-            isMusicOn = true;
-        }
-        repaint();
-    }
+    repaint(); 
+    // Cập nhật lại giao diện nếu có thành phần nào phụ thuộc vào trạng thái nhạc
+}
 
     @Override
     public void paint(Graphics g) {
@@ -301,7 +320,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener {
         if (paused) {
             g.setColor(Color.BLACK);
             g.setFont(new Font("Serif", Font.BOLD, 50));
-            g.drawString("Dừng", 260, 300);
+            g.drawString("Tạm Dừng", 260, 300);
         }
 
         g.dispose();
